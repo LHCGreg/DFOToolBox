@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NpkReader", "NpkReader\NpkReader.csproj", "{04C832F4-8F9D-457A-99FE-CC33EAA98BFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NpkReader.Sandbox", "NpkReader.Sandbox\NpkReader.Sandbox.csproj", "{E070D4F5-863E-4911-AC42-8F9B827F8C20}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04C832F4-8F9D-457A-99FE-CC33EAA98BFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04C832F4-8F9D-457A-99FE-CC33EAA98BFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04C832F4-8F9D-457A-99FE-CC33EAA98BFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04C832F4-8F9D-457A-99FE-CC33EAA98BFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E070D4F5-863E-4911-AC42-8F9B827F8C20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E070D4F5-863E-4911-AC42-8F9B827F8C20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E070D4F5-863E-4911-AC42-8F9B827F8C20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E070D4F5-863E-4911-AC42-8F9B827F8C20}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
