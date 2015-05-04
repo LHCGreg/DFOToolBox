@@ -214,7 +214,7 @@ namespace DFO.NpkReader
             Seek(spriteFileLocation.FileOffset, SeekOrigin.Begin);
 
             // .img files begin with "Neople Image File\0" in ASCII
-            string imageFileHeader = "Neople Image File\0";
+            string imageFileHeader = "Neople Img File\0";
             byte[] headerBuffer = new byte[imageFileHeader.Length];
             m_npkStream.ReadOrDie(headerBuffer, headerBuffer.Length);
             string headerString = Encoding.ASCII.GetString(headerBuffer);
