@@ -223,9 +223,9 @@ namespace DFO.NpkReader
                 throw new NpkException("Did not find expected image file header.");
             }
 
-            // Don't know what these 4 bytes, 2 bytes, and 4 bytes are
+            // Don't know what these 4 bytes, 4 bytes, and 4 bytes are
             uint unknown1 = GetUnsigned32Le();
-            ushort unknown2 = GetUnsigned16Le();
+            uint unknown2 = GetUnsigned32Le();
             uint unknown3 = GetUnsigned32Le();
 
             // 32-bit unsigned int - number of frames in the .img file
@@ -265,7 +265,7 @@ namespace DFO.NpkReader
                 uint imageLink = GetUnsigned32Le();
                 return new Tuple<FrameInfo, NpkByteRange>(new FrameInfo(imageLink), null);
             }
-            else // mode == 14?
+            else // mode == 16?
             {
                 uint compressedField = GetUnsigned32Le();
                 bool isCompressed = compressedField != 5; // 6 = true, 5 = false
