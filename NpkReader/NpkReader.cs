@@ -213,7 +213,7 @@ namespace DFO.NpkReader
             // Seek to the sprite file's location in the .npk
             Seek(spriteFileLocation.FileOffset, SeekOrigin.Begin);
 
-            // .img files begin with "Neople Image File\0" in ASCII
+            // .img files begin with "Neople Img File\0" in ASCII
             string imageFileHeader = "Neople Img File\0";
             byte[] headerBuffer = new byte[imageFileHeader.Length];
             m_npkStream.ReadOrDie(headerBuffer, headerBuffer.Length);
