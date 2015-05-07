@@ -13,6 +13,7 @@ namespace DFO.NpkReader
         public uint? LinkFrame { get; private set; }
 
         public bool IsCompressed { get; private set; }
+        public uint CompressedLength { get; private set; }
         public uint Mode { get; private set; }
         public uint Width { get; private set; }
         public uint Height { get; private set; }
@@ -26,10 +27,11 @@ namespace DFO.NpkReader
             LinkFrame = linkFrame;
         }
 
-        internal FrameInfo(bool isCompressed, uint mode, uint width, uint height, uint locationX, uint locationY, uint maxWidth,
+        internal FrameInfo(bool isCompressed, uint compressedLength, uint mode, uint width, uint height, uint locationX, uint locationY, uint maxWidth,
             uint maxHeight)
         {
             IsCompressed = isCompressed;
+            CompressedLength = compressedLength;
             Mode = mode;
             Width = width;
             Height = height;

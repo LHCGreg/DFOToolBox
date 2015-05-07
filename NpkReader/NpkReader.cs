@@ -234,15 +234,35 @@ namespace DFO.NpkReader
             List<FrameInfo> frames = new List<FrameInfo>();
             List<NpkByteRange> frameLocations = new List<NpkByteRange>();
 
-            // Next is each frame, one after the other.
+            // Next is each frame's metadata, one after the other.
             for (uint frameIndex = 0; frameIndex < numFrames; frameIndex++)
             {
-                Tuple<FrameInfo, NpkByteRange> frameAndLocation = ReadFrame();
-                FrameInfo frame = frameAndLocation.Item1;
-                NpkByteRange frameLocation = frameAndLocation.Item2;
-
+                FrameInfo frame = ReadFrameMetadata();
                 frames.Add(frame);
-                frameLocations.Add(frameLocation);
+            }
+
+            // Next is each non-reference frame's pixel data, one after the other.
+            for (uint frameIndex = 0; frameIndex < numFrames; frameIndex++)
+            {
+                FrameInfo frame = frames[(int)frameIndex];
+                if (frame.LinkFrame != null)
+                {
+                    // Link frames have no pixel data
+                    continue;
+                }
+
+                NpkByteRange frameByteRange = null;
+                if (frame.IsCompressed)
+                {
+                    frameByteRange = new NpkByteRange(m_npkStream.Position, frame.CompressedLength);
+                }
+                else
+                {
+                    frameByteRange = new NpkByteRange(m_npkStream.Position, frame.CompressedLength / 2);
+                }
+
+                frameLocations.Add(frameByteRange);
+                Seek(frameByteRange.Size, SeekOrigin.Current);
             }
 
             m_images[spriteFilePath] = frames;
@@ -250,20 +270,20 @@ namespace DFO.NpkReader
         }
 
         /// <summary>
-        /// Reads an image frame at the current position, advancing the read pointer to the next frame.
+        /// Reads an image frame metadata at the current position, advancing the read pointer to the next frame's metadata.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="System.IO.IOException">I/O error.</exception>
         /// <exception cref="System.IO.EndOfStreamException">Unexpected end of file.</exception>
         /// <exception cref="Dfo.Parser.NpkException">The .npk appears to be corrupt.</exception>
-        private Tuple<FrameInfo, NpkByteRange> ReadFrame()
+        private FrameInfo ReadFrameMetadata()
         {
             uint mode = GetUnsigned32Le();
             if (mode == 0x11u)
             {
                 // reference
                 uint imageLink = GetUnsigned32Le();
-                return new Tuple<FrameInfo, NpkByteRange>(new FrameInfo(imageLink), null);
+                return new FrameInfo(imageLink);
             }
             else // mode == 16?
             {
@@ -279,23 +299,7 @@ namespace DFO.NpkReader
                 uint maxHeight = GetUnsigned32Le();
 
                 long imageLocation = m_npkStream.Position;
-                FrameInfo frame = new FrameInfo(isCompressed, mode, width, height, keyX, keyY, maxWidth, maxHeight);
-                NpkByteRange location;
-
-                if (isCompressed)
-                {
-                    // Skip over the pixel data
-                    Seek(compressedLength, SeekOrigin.Current);
-                    location = new NpkByteRange(imageLocation, compressedLength);
-                }
-                else
-                {
-                    // Skip over the pixel data
-                    Seek(compressedLength / 2, SeekOrigin.Current);
-                    location = new NpkByteRange(imageLocation, compressedLength / 2);
-                }
-
-                return new Tuple<FrameInfo, NpkByteRange>(frame, location);
+                return new FrameInfo(isCompressed, compressedLength, mode, width, height, keyX, keyY, maxWidth, maxHeight);
             }
         }
 
