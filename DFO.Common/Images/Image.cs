@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DFO.Common.Images;
 
-namespace DFO.NpkReader
+namespace DFO.Common.Images
 {
     public class Image
     {
@@ -14,7 +15,7 @@ namespace DFO.NpkReader
         public byte[] PixelData { get; private set; }
         public FrameInfo Attributes { get; private set; }
 
-        internal Image(byte[] pixelData, FrameInfo attributes)
+        public Image(byte[] pixelData, FrameInfo attributes)
         {
             PixelData = pixelData;
             Attributes = attributes;

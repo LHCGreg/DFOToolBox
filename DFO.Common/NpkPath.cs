@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using DFO.Utilities;
 
-namespace DFO.NpkReader
+namespace DFO.Common
 {
     /// <summary>
     /// Represents the path of an image or sound located in a .npk file. Example: Interface/Emoticon/Against.img.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DFO.NpkReader
+namespace DFO.Common.Images
 {
     public class FrameInfo
     {
@@ -22,12 +22,12 @@ namespace DFO.NpkReader
         public uint MaxWidth { get; private set; }
         public uint MaxHeight { get; private set; }
 
-        internal FrameInfo(uint linkFrame)
+        public FrameInfo(uint linkFrame)
         {
             LinkFrame = linkFrame;
         }
 
-        internal FrameInfo(bool isCompressed, uint compressedLength, uint mode, uint width, uint height, uint locationX, uint locationY, uint maxWidth,
+        public FrameInfo(bool isCompressed, uint compressedLength, uint mode, uint width, uint height, uint locationX, uint locationY, uint maxWidth,
             uint maxHeight)
         {
             IsCompressed = isCompressed;

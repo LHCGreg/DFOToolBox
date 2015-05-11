@@ -6,10 +6,12 @@ using System.IO;
 using ICSharpCode.SharpZipLib;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using DFO.Utilities;
+using DFO.Common;
+using DFO.Common.Images;
 
 namespace DFO.NpkReader
 {
-    public class NpkReader : IDisposable
+    public class NpkReader : IImageSource, IDisposable
     {
         private FileStream m_npkStream;
         private byte[] m_intBuffer = new byte[4];
@@ -285,7 +287,7 @@ namespace DFO.NpkReader
                 uint imageLink = GetUnsigned32Le();
                 return new FrameInfo(imageLink);
             }
-            else // mode == 16?
+            else // mode indicates the format of the pixel data
             {
                 uint compressedField = GetUnsigned32Le();
                 bool isCompressed = compressedField != 5; // 6 = true, 5 = false

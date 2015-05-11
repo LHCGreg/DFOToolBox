@@ -9,7 +9,7 @@ namespace DFO.Utilities
     /// <summary>
     /// Static class containing some utility extension methods.
     /// </summary>
-    internal static class UtilityExtensions
+    public static class UtilityExtensions
     {
         /// <summary>
         /// Rotates <paramref name="number"/> left by <paramref name="numBitstoRotate"/> bits. If

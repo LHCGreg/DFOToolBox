@@ -9,7 +9,7 @@ namespace DFO.Utilities
     /// <summary>
     /// Static class containing utility methods.
     /// </summary>
-    internal static class Utils
+    public static class Utils
     {
         /// <summary>
         /// Checks to make sure <paramref name="path"/> does not contain any characters in

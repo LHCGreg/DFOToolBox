@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{04C832F4-8F9D-457A-99FE-CC33EAA98BFE}</ProjectGuid>
+    <ProjectGuid>{F96DE472-94CE-46DC-89FE-049207CC9541}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DFO.NpkReader</RootNamespace>
-    <AssemblyName>NpkReader</AssemblyName>
+    <RootNamespace>DFO.Common</RootNamespace>
+    <AssemblyName>DFO.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,45 +29,29 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="MiscUtil">
-      <HintPath>..\packages\JonSkeet.MiscUtil.0.1\lib\net35-Client\MiscUtil.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FrameInfo.cs" />
-    <Compile Include="Image.cs" />
-    <Compile Include="NpkByteRange.cs" />
-    <Compile Include="NpkException.cs" />
+    <Compile Include="Images\AnimationFrame.cs" />
+    <Compile Include="Images\ConstAnimationFrame.cs" />
+    <Compile Include="Images\ConstRawAnimation.cs" />
+    <Compile Include="Images\FrameInfo.cs" />
+    <Compile Include="Images\IImageSource.cs" />
+    <Compile Include="Images\Image.cs" />
+    <Compile Include="Images\ImageIdentifier.cs" />
+    <Compile Include="Images\RawAnimation.cs" />
     <Compile Include="NpkPath.cs" />
-    <Compile Include="NpkReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptPvfPath.cs" />
-    <Compile Include="SoundInfo.cs" />
-    <Compile Include="Utilities\DeepReadOnlyCollection.cs" />
-    <Compile Include="Utilities\DeepReadOnlyDictionary.cs" />
-    <Compile Include="Utilities\IConstable.cs" />
-    <Compile Include="Utilities\IReadOnlyDictionary.cs" />
-    <Compile Include="Utilities\ReadOnlyDictionary.cs" />
-    <Compile Include="Utilities\UtilityExtensions.cs" />
-    <Compile Include="Utilities\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
+    <ProjectReference Include="..\DFO.Utilities\DFO.Utilities.csproj">
+      <Project>{9aba11f3-61ac-4b40-8432-91b3fe9ca351}</Project>
+      <Name>DFO.Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using DFO.Utilities;
 
-namespace DFO
+namespace DFO.Common
 {
     /// <summary>
     /// Allows comparing Script.pvf paths for equality. Two paths are considered equal if they refer to the
