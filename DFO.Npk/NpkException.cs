@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DFO.NpkReader
+namespace DFO.Npk
 {
     /// <summary>
     /// Indicates a malformed .npk file.

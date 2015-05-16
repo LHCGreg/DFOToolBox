@@ -9,7 +9,7 @@ using DFO.Utilities;
 using DFO.Common;
 using DFO.Common.Images;
 
-namespace DFO.NpkReader
+namespace DFO.Npk
 {
     public class NpkReader : IImageSource, IDisposable
     {
@@ -175,11 +175,7 @@ namespace DFO.NpkReader
                 if (pathComponents.Count >= 1)
                 {
                     // Build up the NpkPath that is the same NpkPath but without the first component
-                    NpkPath pathWithoutPrefix = new NpkPath("");
-                    for (int i = 1; i < pathComponents.Count; i++)
-                    {
-                        pathWithoutPrefix = NpkPath.Combine(pathWithoutPrefix, pathComponents[i]);
-                    }
+                    NpkPath pathWithoutPrefix = pathWithPrefix.StripPrefix();
 
                     NpkByteRange fileLocation = new NpkByteRange(absoluteLocation, size);
                     if (pathComponents[0].Equals("sprite"))
@@ -250,6 +246,8 @@ namespace DFO.NpkReader
                 if (frame.LinkFrame != null)
                 {
                     // Link frames have no pixel data
+                    // Could set this to referenced frame's data to simply code elsewhere?
+                    frameLocations.Add(new NpkByteRange(0, 0));
                     continue;
                 }
 
@@ -300,7 +298,6 @@ namespace DFO.NpkReader
                 uint maxWidth = GetUnsigned32Le();
                 uint maxHeight = GetUnsigned32Le();
 
-                long imageLocation = m_npkStream.Position;
                 return new FrameInfo(isCompressed, compressedLength, mode, width, height, keyX, keyY, maxWidth, maxHeight);
             }
         }

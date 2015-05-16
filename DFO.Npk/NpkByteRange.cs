@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DFO.NpkReader
+namespace DFO.Npk
 {
     /// <summary>
     /// Represents a region of an .npk file.

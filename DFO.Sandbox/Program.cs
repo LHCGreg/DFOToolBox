@@ -10,8 +10,9 @@ using System.Windows.Media.Imaging;
 using DFO.Common;
 using DFO.Common.Images;
 using DFO.Gif;
+using DFO.Npk;
 
-namespace DFO.NpkReader.Sandbox
+namespace DFO.Sandbox
 {
     class Program
     {

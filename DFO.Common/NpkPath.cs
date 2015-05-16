@@ -107,6 +107,18 @@ namespace DFO.Common
             return npkBuilder.ToString();
         }
 
+        public NpkPath StripPrefix()
+        {
+            IList<NpkPath> pathComponents = GetPathComponents();
+            NpkPath pathWithoutPrefix = new NpkPath("");
+            for (int i = 1; i < pathComponents.Count; i++)
+            {
+                pathWithoutPrefix = NpkPath.Combine(pathWithoutPrefix, pathComponents[i]);
+            }
+
+            return pathWithoutPrefix;
+        }
+
         /// <summary>
         /// Combines two Npk Paths together to form one path. If either path is the root directory, the
         /// other path is returned.

@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.NpkReader", "NpkReader\DFO.NpkReader.csproj", "{04C832F4-8F9D-457A-99FE-CC33EAA98BFE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Npk", "DFO.Npk\DFO.Npk.csproj", "{04C832F4-8F9D-457A-99FE-CC33EAA98BFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NpkReader.Sandbox", "NpkReader.Sandbox\NpkReader.Sandbox.csproj", "{E070D4F5-863E-4911-AC42-8F9B827F8C20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Sandbox", "DFO.Sandbox\DFO.Sandbox.csproj", "{E070D4F5-863E-4911-AC42-8F9B827F8C20}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Common", "DFO.Common\DFO.Common.csproj", "{F96DE472-94CE-46DC-89FE-049207CC9541}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Utilities", "DFO.Utilities\DFO.Utilities.csproj", "{9ABA11F3-61AC-4B40-8432-91B3FE9CA351}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Gif", "DFO.Gif\DFO.Gif.csproj", "{44912ED2-024B-4EBF-B02F-910142C81E75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "npk2gif", "npk2gif\npk2gif.csproj", "{D4F67769-4AE4-46CA-8442-D463DE903C21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{44912ED2-024B-4EBF-B02F-910142C81E75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44912ED2-024B-4EBF-B02F-910142C81E75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44912ED2-024B-4EBF-B02F-910142C81E75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4F67769-4AE4-46CA-8442-D463DE903C21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4F67769-4AE4-46CA-8442-D463DE903C21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4F67769-4AE4-46CA-8442-D463DE903C21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4F67769-4AE4-46CA-8442-D463DE903C21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
