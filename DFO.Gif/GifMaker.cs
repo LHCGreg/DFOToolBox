@@ -99,7 +99,7 @@ namespace DFO.Gif
             {
                 uint startX = rawFrame.Attributes.LocationX;
                 uint endX = startX + rawFrame.Attributes.Width;
-                uint startY = rawFrame.Attributes.LocationX;
+                uint startY = rawFrame.Attributes.LocationY;
                 uint endY = startY + rawFrame.Attributes.Height;
 
                 if (startX < smallestX)
