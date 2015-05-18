@@ -8,15 +8,40 @@ namespace DFO.Npk
     /// <summary>
     /// Represents a region of an .npk file.
     /// </summary>
-    internal class NpkByteRange
+    internal struct NpkByteRange : IEquatable<NpkByteRange>
     {
         public long FileOffset { get; private set; }
         public uint Size { get; private set; }
 
         public NpkByteRange(long fileOffset, uint size)
+            : this()
         {
             FileOffset = fileOffset;
             Size = size;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is NpkByteRange)
+                return Equals((NpkByteRange)obj);
+            else
+                return false;
+        }
+
+        public bool Equals(NpkByteRange other)
+        {
+            return this.FileOffset == other.FileOffset && this.Size == other.Size;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 23;
+                hash = hash * 31 + (int)FileOffset;
+                hash = hash * 31 + (int)Size;
+                return hash;
+            }
         }
     }
 }

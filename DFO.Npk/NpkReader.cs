@@ -251,7 +251,7 @@ namespace DFO.Npk
                     continue;
                 }
 
-                NpkByteRange frameByteRange = null;
+                NpkByteRange frameByteRange;
                 if (frame.IsCompressed)
                 {
                     frameByteRange = new NpkByteRange(m_npkStream.Position, frame.CompressedLength);
