@@ -157,7 +157,7 @@ namespace DFO.npk2gif
             {
                 for (int frameIndex = 0; frameIndex < frames.Count; frameIndex++)
                 {
-                    frameInfo.Add(new AnimationFrame() { DelayInMs = (uint)cmdLine.FrameDelayInMs, Image = new ImageIdentifier(imgPath, (uint)frameIndex) }.AsConst());
+                    frameInfo.Add(new AnimationFrame() { DelayInMs = cmdLine.FrameDelayInMs, Image = new ImageIdentifier(imgPath, frameIndex) }.AsConst());
                 }
             }
             else
@@ -169,7 +169,7 @@ namespace DFO.npk2gif
                         Console.Error.WriteLine("{0} in {1} has {2} frames in it, so frame index {3} is not valid.", imgPath, cmdLine.NpkPath, frames.Count, frameIndex);
                         Environment.Exit(1);
                     }
-                    frameInfo.Add(new AnimationFrame() { DelayInMs = (uint)cmdLine.FrameDelayInMs, Image = new ImageIdentifier(imgPath, (uint)frameIndex) }.AsConst());
+                    frameInfo.Add(new AnimationFrame() { DelayInMs = cmdLine.FrameDelayInMs, Image = new ImageIdentifier(imgPath, frameIndex) }.AsConst());
                 }
             }
 

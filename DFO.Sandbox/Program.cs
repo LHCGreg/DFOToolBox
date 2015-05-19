@@ -18,20 +18,37 @@ namespace DFO.Sandbox
     {
         static void Main(string[] args)
         {
-            using (NpkReader npkReader = new NpkReader(@"C:\Neople\DFO\ImagePacks2\sprite_worldmap_act1.NPK"))
+            foreach (string path in Directory.GetFiles(@"C:\Neople\DFO\ImagePacks2", "*.NPK"))
+            {
+                using (NpkReader npk = new NpkReader(path))
+                {
+                    if (npk.Images.Keys.Any(img => img.Path.EndsWith("bufficon.img")))
+                    {
+                        Console.WriteLine(path);
+                        Environment.Exit(0);
+                    }
+
+                    Console.WriteLine("Read {0}", path);
+                }
+            }
+
+            Console.WriteLine("Not found!");
+            Environment.Exit(0);
+
+            using (NpkReader npkReader = new NpkReader(@"C:\Neople\DFO\ImagePacks2\sprite_monster_impossible_bakal.NPK"))
             using (NpkReader coolReader = new NpkReader(@"C:\Neople\DFO\ImagePacks2\sprite_character_swordman_effect_sayaex.NPK"))
             {
-                DFO.Common.Images.Image image = npkReader.GetImage("worldmap/act1/elvengard.img", 0);
+                DFO.Common.Images.Image image = npkReader.GetImage("monster/impossible_bakal/ashcore.img", 0);
                 //Image image2 = npkReader.GetImage("worldmap/act1/elvengard.img", 1);
-                using (Bitmap bitmap = new Bitmap((int)image.Attributes.Width, (int)image.Attributes.Height))
+                using (Bitmap bitmap = new Bitmap(image.Attributes.Width, image.Attributes.Height))
                 {
-                    BitmapData raw = bitmap.LockBits(new Rectangle(0, 0, (int)image.Attributes.Width, (int)image.Attributes.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    BitmapData raw = bitmap.LockBits(new Rectangle(0, 0, image.Attributes.Width, image.Attributes.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                     unsafe
                     {
                         byte* ptr = (byte*)raw.Scan0;
                         // RGBA -> BGRA (pixels in the bitmap have endianness)
-                        int width = (int)image.Attributes.Width;
-                        int height = (int)image.Attributes.Height;
+                        int width = image.Attributes.Width;
+                        int height = image.Attributes.Height;
                         int stride = raw.Stride;
                         for (int x = 0; x < width; x++)
                         {

@@ -11,9 +11,9 @@ namespace DFO.Npk
     internal struct NpkByteRange : IEquatable<NpkByteRange>
     {
         public long FileOffset { get; private set; }
-        public uint Size { get; private set; }
+        public int Size { get; private set; }
 
-        public NpkByteRange(long fileOffset, uint size)
+        public NpkByteRange(long fileOffset, int size)
             : this()
         {
             FileOffset = fileOffset;
@@ -39,7 +39,7 @@ namespace DFO.Npk
             {
                 int hash = 23;
                 hash = hash * 31 + (int)FileOffset;
-                hash = hash * 31 + (int)Size;
+                hash = hash * 31 + Size;
                 return hash;
             }
         }

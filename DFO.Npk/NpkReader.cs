@@ -177,7 +177,7 @@ namespace DFO.Npk
                     // Build up the NpkPath that is the same NpkPath but without the first component
                     NpkPath pathWithoutPrefix = pathWithPrefix.StripPrefix();
 
-                    NpkByteRange fileLocation = new NpkByteRange(absoluteLocation, size);
+                    NpkByteRange fileLocation = new NpkByteRange(absoluteLocation, (int)size);
                     if (pathComponents[0].Equals("sprite"))
                     {
                         m_imageFileLocations[pathWithoutPrefix] = fileLocation;
@@ -229,8 +229,8 @@ namespace DFO.Npk
             // 32-bit unsigned int - number of frames in the .img file
             uint numFrames = GetUnsigned32Le();
 
-            List<FrameInfo> frames = new List<FrameInfo>();
-            List<NpkByteRange> frameLocations = new List<NpkByteRange>();
+            List<FrameInfo> frames = new List<FrameInfo>((int)numFrames);
+            List<NpkByteRange> frameLocations = new List<NpkByteRange>((int)numFrames);
 
             // Next is each frame's metadata, one after the other.
             for (uint frameIndex = 0; frameIndex < numFrames; frameIndex++)
@@ -279,11 +279,11 @@ namespace DFO.Npk
         private FrameInfo ReadFrameMetadata()
         {
             uint mode = GetUnsigned32Le();
-            if (mode == 0x11u)
+            if ((int)mode == (int)PixelDataFormat.Link)
             {
                 // reference
                 uint imageLink = GetUnsigned32Le();
-                return new FrameInfo(imageLink);
+                return new FrameInfo((int)imageLink);
             }
             else // mode indicates the format of the pixel data
             {
@@ -298,7 +298,7 @@ namespace DFO.Npk
                 uint maxWidth = GetUnsigned32Le();
                 uint maxHeight = GetUnsigned32Le();
 
-                return new FrameInfo(isCompressed, compressedLength, mode, width, height, keyX, keyY, maxWidth, maxHeight);
+                return new FrameInfo(isCompressed, (int)compressedLength, (PixelDataFormat)mode, (int)width, (int)height, (int)keyX, (int)keyY, (int)maxWidth, (int)maxHeight);
             }
         }
 
@@ -360,7 +360,7 @@ namespace DFO.Npk
         /// or no frame with the given index exists in the img file.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
         /// <exception cref="Dfo.Parser.NpkException">The .npk file is corrupt or the format changed.</exception>
-        public Image GetImage(NpkPath imgPath, uint frameIndex)
+        public Image GetImage(NpkPath imgPath, int frameIndex)
         {
             imgPath.ThrowIfNull("imgPath");
 
@@ -379,23 +379,23 @@ namespace DFO.Npk
                         .F(frameIndex, imgPath, imgFrames.Count));
                 }
 
-                FrameInfo frameData = imgFrames[(int)frameIndex];
-                uint realFrameIndex = frameIndex;
+                FrameInfo frameData = imgFrames[frameIndex];
+                int realFrameIndex = frameIndex;
 
                 // Follow frame links
                 while (frameData.LinkFrame != null)
                 {
                     // TODO: Detect infinite links - or maybe only allow one link to be followed.
                     realFrameIndex = frameData.LinkFrame.Value;
-                    if (realFrameIndex >= imgFrames.Count)
+                    if (realFrameIndex >= imgFrames.Count || realFrameIndex < 0)
                     {
                         throw new FileNotFoundException("Cannot get linked frame index {0} of {1}. It only has {2} frames."
                             .F(realFrameIndex, imgPath, imgFrames.Count));
                     }
-                    frameData = imgFrames[(int)realFrameIndex];
+                    frameData = imgFrames[realFrameIndex];
                 }
 
-                NpkByteRange pixelDataLocation = m_frameLocations[imgPath][(int)realFrameIndex];
+                NpkByteRange pixelDataLocation = m_frameLocations[imgPath][realFrameIndex];
                 // Seek to the pixel data and read it
                 Seek(pixelDataLocation.FileOffset, SeekOrigin.Begin);
                 byte[] pixelData = new byte[pixelDataLocation.Size];
@@ -440,9 +440,9 @@ namespace DFO.Npk
         private byte[] ExpandPixelData(byte[] rawPixelData, FrameInfo frameData)
         {
             byte[] expandedPixelData = new byte[frameData.Width * frameData.Height * 4];
-            switch (frameData.Mode)
+            switch (frameData.PixelFormat)
             {
-                case 0x0E: // ARGB 1555
+                case PixelDataFormat.OneFiveFiveFive:
                     // Make sure sizes match
                     if (rawPixelData.Length != frameData.Width * frameData.Height * 2)
                     {
@@ -469,7 +469,7 @@ namespace DFO.Npk
                         expandedPixelData[expandedIndex + 3] = a;
                     }
                     break;
-                case 0x0F: // 4444
+                case PixelDataFormat.FourFourFourFour:
                     if (rawPixelData.Length != frameData.Width * frameData.Height * 2)
                     {
                         throw new NpkException(
@@ -498,7 +498,7 @@ namespace DFO.Npk
                         expandedPixelData[expandedIndex + 3] = a;
                     }
                     break;
-                case 0x10: // 8888
+                case PixelDataFormat.EightEightEightEight:
                     if (rawPixelData.Length != frameData.Width * frameData.Height * 4)
                     {
                         throw new NpkException(

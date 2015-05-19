@@ -10,29 +10,30 @@ namespace DFO.Common.Images
         /// <summary>
         /// Gets the index of the frame that this frame links to or null if this frame is not a link.
         /// </summary>
-        public uint? LinkFrame { get; private set; }
+        public int? LinkFrame { get; private set; }
 
         public bool IsCompressed { get; private set; }
-        public uint CompressedLength { get; private set; }
-        public uint Mode { get; private set; }
-        public uint Width { get; private set; }
-        public uint Height { get; private set; }
-        public uint LocationX { get; private set; }
-        public uint LocationY { get; private set; }
-        public uint MaxWidth { get; private set; }
-        public uint MaxHeight { get; private set; }
+        public int CompressedLength { get; private set; }
+        public PixelDataFormat PixelFormat { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public int LocationX { get; private set; }
+        public int LocationY { get; private set; }
+        public int MaxWidth { get; private set; }
+        public int MaxHeight { get; private set; }
 
-        public FrameInfo(uint linkFrame)
+        public FrameInfo(int linkFrame)
         {
             LinkFrame = linkFrame;
+            PixelFormat = PixelDataFormat.Link;
         }
 
-        public FrameInfo(bool isCompressed, uint compressedLength, uint mode, uint width, uint height, uint locationX, uint locationY, uint maxWidth,
-            uint maxHeight)
+        public FrameInfo(bool isCompressed, int compressedLength, PixelDataFormat pixelFormat, int width, int height, int locationX, int locationY, int maxWidth,
+            int maxHeight)
         {
             IsCompressed = isCompressed;
             CompressedLength = compressedLength;
-            Mode = mode;
+            PixelFormat = pixelFormat;
             Width = width;
             Height = height;
             LocationX = locationX;

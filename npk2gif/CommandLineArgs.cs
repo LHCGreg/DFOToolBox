@@ -77,12 +77,6 @@ namespace DFO.npk2gif
 
         public string OutputPath { get; private set; }
 
-        // -npk
-        // -img
-        // -frames (optional, use all by default)
-        // -d, -delay, -frameDelay (optional, default to 100 ms)
-        // -o, --output
-
         public OptionSet GetOptionSet()
         {
             OptionSet optionSet = new OptionSet()

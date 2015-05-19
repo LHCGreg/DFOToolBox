@@ -42,6 +42,7 @@
     <Compile Include="Images\IImageSource.cs" />
     <Compile Include="Images\Image.cs" />
     <Compile Include="Images\ImageIdentifier.cs" />
+    <Compile Include="Images\PixelDataFormat.cs" />
     <Compile Include="Images\RawAnimation.cs" />
     <Compile Include="NpkPath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

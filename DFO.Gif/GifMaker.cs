@@ -51,16 +51,16 @@ namespace DFO.Gif
                 rawFrames.Add(rawFrame);
             }
 
-            uint smallestX;
-            uint largestX;
-            uint smallestY;
-            uint largestY;
+            int smallestX;
+            int largestX;
+            int smallestY;
+            int largestY;
 
             // Frames can have different start positions and widths/heights. Normalize the images to a common coordinate system.
             GetNormalizedCoordinates(rawFrames, out smallestX, out largestX, out smallestY, out largestY);
 
-            uint normalizedWidth = largestX - smallestX;
-            uint normalizedHeight = largestY - smallestY;
+            int normalizedWidth = largestX - smallestX;
+            int normalizedHeight = largestY - smallestY;
 
             List<MagickImage> renderedFrames = new List<MagickImage>();
 
@@ -88,19 +88,19 @@ namespace DFO.Gif
             }
         }
 
-        private void GetNormalizedCoordinates(List<Image> rawFrames, out uint smallestX, out uint largestX, out uint smallestY, out uint largestY)
+        private void GetNormalizedCoordinates(List<Image> rawFrames, out int smallestX, out int largestX, out int smallestY, out int largestY)
         {
-            smallestX = uint.MaxValue;
+            smallestX = int.MaxValue;
             largestX = 0;
-            smallestY = uint.MaxValue;
+            smallestY = int.MaxValue;
             largestY = 0;
 
             foreach (Image rawFrame in rawFrames)
             {
-                uint startX = rawFrame.Attributes.LocationX;
-                uint endX = startX + rawFrame.Attributes.Width;
-                uint startY = rawFrame.Attributes.LocationY;
-                uint endY = startY + rawFrame.Attributes.Height;
+                int startX = rawFrame.Attributes.LocationX;
+                int endX = startX + rawFrame.Attributes.Width;
+                int startY = rawFrame.Attributes.LocationY;
+                int endY = startY + rawFrame.Attributes.Height;
 
                 if (startX < smallestX)
                 {
@@ -121,20 +121,20 @@ namespace DFO.Gif
             }
         }
 
-        private MagickImage RenderFrame(Image rawFrameImage, ConstAnimationFrame frameAnimationInfo, uint smallestX, uint largestX, uint smallestY, uint largestY, uint normalizedWidth, uint normalizedHeight)
+        private MagickImage RenderFrame(Image rawFrameImage, ConstAnimationFrame frameAnimationInfo, int smallestX, int largestX, int smallestY, int largestY, int normalizedWidth, int normalizedHeight)
         {
             MagickImage renderedFrame = new MagickImage(new MagickColor(0, 0, 0, 0), (int)normalizedWidth, (int)normalizedHeight);
 
-            uint normalizedFrameX = rawFrameImage.Attributes.LocationX - smallestX;
-            uint normalizedFrameY = rawFrameImage.Attributes.LocationY - smallestY;
+            int normalizedFrameX = rawFrameImage.Attributes.LocationX - smallestX;
+            int normalizedFrameY = rawFrameImage.Attributes.LocationY - smallestY;
 
             if (rawFrameImage.PixelData.Length > 0)
             {
                 MagickReadSettings pixelDataSettings = new MagickReadSettings()
                 {
                     ColorSpace = ColorSpace.RGB,
-                    Width = (int)rawFrameImage.Attributes.Width,
-                    Height = (int)rawFrameImage.Attributes.Height,
+                    Width = rawFrameImage.Attributes.Width,
+                    Height = rawFrameImage.Attributes.Height,
                     PixelStorage = new PixelStorageSettings(StorageType.Char, "RGBA")
                 };
 
@@ -147,7 +147,7 @@ namespace DFO.Gif
             }
 
             renderedFrame.Format = MagickFormat.Gif;
-            renderedFrame.AnimationDelay = (int)frameAnimationInfo.DelayInMs / 10;
+            renderedFrame.AnimationDelay = frameAnimationInfo.DelayInMs / 10;
             renderedFrame.GifDisposeMethod = GifDisposeMethod.Background;
             renderedFrame.AnimationIterations = 0;
             renderedFrame.MatteColor = new MagickColor(0, 0, 0, 0);

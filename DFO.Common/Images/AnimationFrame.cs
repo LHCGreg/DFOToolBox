@@ -39,7 +39,19 @@ namespace DFO.Common.Images
         private string m_graphicEffect = "NONE";
         public string GraphicEffect { get { return m_graphicEffect; } set { m_graphicEffect = value; } }
 
-        public uint DelayInMs { get; set; }
+        private int m_delayInMs;
+        public int DelayInMs
+        {
+            get { return m_delayInMs; }
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException("DelayInMs", string.Format("Delay in ms cannot be {0}, it must not be negative.", value));
+                }
+                m_delayInMs = value;
+            }
+        }
 
         public AnimationFrame()
         {

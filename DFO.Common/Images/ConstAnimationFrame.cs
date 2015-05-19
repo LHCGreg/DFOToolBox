@@ -22,7 +22,7 @@ namespace DFO.Common.Images
         public int Alpha { get { return m_mutable.Alpha; } }
         public bool Interpolation { get { return m_mutable.Interpolation; } }
         public string GraphicEffect { get { return m_mutable.GraphicEffect; } }
-        public uint DelayInMs { get { return m_mutable.DelayInMs; } }
+        public int DelayInMs { get { return m_mutable.DelayInMs; } }
         // TODO: DamageType - don't know possible values at this time
         // TODO: DamageBox - don't know structure of it at this time
         // TODO: Find out what other settings are possible

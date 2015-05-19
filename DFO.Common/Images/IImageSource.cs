@@ -16,6 +16,6 @@ namespace DFO.Common.Images
         /// <returns></returns>
         /// <exception cref="System.IO.FileNotFoundException">The img file does not exist in this .npk file
         /// or no frame with the given index exists in the img file.</exception>
-        Image GetImage(NpkPath imgPath, uint frameIndex);
+        Image GetImage(NpkPath imgPath, int frameIndex);
     }
 }

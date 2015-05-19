@@ -10,9 +10,9 @@ namespace DFO.Common.Images
     public class ImageIdentifier
     {
         public NpkPath ImageFilePath { get; private set; }
-        public uint FrameIndex { get; private set; }
+        public int FrameIndex { get; private set; }
 
-        public ImageIdentifier(NpkPath imageFilePath, uint frameIndex)
+        public ImageIdentifier(NpkPath imageFilePath, int frameIndex)
         {
             ImageFilePath = imageFilePath;
             FrameIndex = frameIndex;
