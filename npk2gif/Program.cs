@@ -108,7 +108,7 @@ namespace DFO.npk2gif
                     imgPath = imgPath.StripPrefix();
                 }
 
-                if (!npk.Images.ContainsKey(imgPath))
+                if (!npk.Frames.ContainsKey(imgPath))
                 {
                     Console.Error.WriteLine("There is no img file with path {0} in NPK file {1}", cmdLine.ImgPath, cmdLine.NpkPath);
                     Environment.Exit(1);
@@ -121,7 +121,7 @@ namespace DFO.npk2gif
                 List<NpkPath> matchingPaths = new List<NpkPath>();
                 
                 // Only the .img name was given. Look for it.
-                foreach (NpkPath path in npk.Images.Keys)
+                foreach (NpkPath path in npk.Frames.Keys)
                 {
                     if (path.GetFileName().Path.Equals(cmdLine.ImgName, StringComparison.OrdinalIgnoreCase))
                     {
@@ -151,7 +151,7 @@ namespace DFO.npk2gif
         private static List<ConstAnimationFrame> GetFrameInfo(CommandLineArgs cmdLine, NpkReader npk, NpkPath imgPath)
         {
             List<ConstAnimationFrame> frameInfo = new List<ConstAnimationFrame>();
-            List<FrameInfo> frames = npk.Images[imgPath].ToList();
+            List<FrameInfo> frames = npk.Frames[imgPath].ToList();
 
             if (cmdLine.UseAllFrames)
             {

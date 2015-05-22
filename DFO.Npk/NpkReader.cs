@@ -19,15 +19,22 @@ namespace DFO.Npk
         private static string s_keyString = "puchikon@neople dungeon and fighter DNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNF\0";
         private static byte[] s_key = Encoding.ASCII.GetBytes(s_keyString);
 
-        private IDictionary<NpkPath, NpkByteRange> m_imageFileLocations = new Dictionary<NpkPath, NpkByteRange>();
-        private IDictionary<NpkPath, NpkByteRange> m_soundFileLocations = new Dictionary<NpkPath, NpkByteRange>();
+        private Dictionary<NpkPath, NpkByteRange> m_imageFileLocations = new Dictionary<NpkPath, NpkByteRange>();
+        private Dictionary<NpkPath, bool> m_imagesInFile = new Dictionary<NpkPath,bool>();
+        public System.Collections.Generic.IReadOnlyDictionary<NpkPath, bool> Images { get { return m_imagesInFile; } }
 
-        private IDictionary<NpkPath, IList<NpkByteRange>> m_frameLocations = new Dictionary<NpkPath, IList<NpkByteRange>>();
+        private Dictionary<NpkPath, NpkByteRange> m_soundFileLocations = new Dictionary<NpkPath, NpkByteRange>();
+
+        private Dictionary<NpkPath, IList<NpkByteRange>> m_frameLocations = new Dictionary<NpkPath, IList<NpkByteRange>>();
 
         // If this is re-set, Images must be updated to point to the new value.
-        private IDictionary<NpkPath, IList<FrameInfo>> m_images = new Dictionary<NpkPath, IList<FrameInfo>>();
+        private Dictionary<NpkPath, IList<FrameInfo>> m_frames = new Dictionary<NpkPath, IList<FrameInfo>>();
+
         // Initialized in constructor
-        public DFO.Utilities.IReadOnlyDictionary<NpkPath, System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>> Images { get; private set; }
+        /// <summary>
+        /// Dictinoary of NpkPath to frame metadata. Paths are not present here if they have not been loaded yet.
+        /// </summary>
+        public DFO.Utilities.IReadOnlyDictionary<NpkPath, System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>> Frames { get; private set; }
 
         private IDictionary<NpkPath, SoundInfo> m_sounds = new Dictionary<NpkPath, SoundInfo>();
         // Initialized in constructor
@@ -36,13 +43,13 @@ namespace DFO.Npk
         public string PathOfNpkFile { get; private set; }
 
         /// <summary>
-        /// 
+        /// Opens the NPK file and reads the metadata for each packed file and each frame in each .img file.
         /// </summary>
         /// <param name="pathOfNpkFile"></param>
         /// <exception cref="System.ArgumentNullException"><paramref name="pathOfNpkFile"/> is null.</exception>
         /// <exception cref="System.IO.FileNotFoundException">The .npk file does not exist.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
-        /// <exception cref="Dfo.Parser.NpkException">The .npk file is corrupt or the format changed.</exception>
+        /// <exception cref="Dfo.Npk.NpkException">The .npk file is corrupt or the format changed.</exception>
         /// <exception cref="System.UnauthorizedAccessException">The caller does not have the required
         /// permission or the file is actually a directory.</exception>
         public NpkReader(string pathOfNpkFile)
@@ -52,12 +59,12 @@ namespace DFO.Npk
                 pathOfNpkFile.ThrowIfNull("pathOfNpkFile");
                 PathOfNpkFile = pathOfNpkFile;
 
-                Images = new DeepReadOnlyDictionary<NpkPath, IList<FrameInfo>, System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>>(
-                    m_images, (IList<FrameInfo> mutableList) => new System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>(mutableList));
+                Frames = new DeepReadOnlyDictionary<NpkPath, IList<FrameInfo>, System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>>(
+                    m_frames, (IList<FrameInfo> mutableList) => new System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>(mutableList));
                 Sounds = new ReadOnlyDictionary<NpkPath, SoundInfo>(m_sounds);
 
                 m_npkStream = OpenNpkFile();
-                LoadNpkHeader();
+                LoadNpkFileTable();
             }
             catch (Exception)
             {
@@ -96,22 +103,85 @@ namespace DFO.Npk
         }
 
         /// <summary>
-        /// Helper function that loads the first part of the .npk header, initializing m_imagefileLocations and
-        /// m_soundFileLocations are loaded when this function completes. The file is assumed to be opened
-        /// with the read pointer at the beginning of the file.
+        /// Helper function that loads the first part of the .npk header. m_imagefileLocations and
+        /// m_soundFileLocations are loaded when this function completes. The stream's read pointer will
+        /// be right after the file table part of the header after completion. This function is only
+        /// intended to be called from LoadNpkHeader().
         /// </summary>
-        /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
-        /// <exception cref="Dfo.Parser.NpkException">The .npk file is corrupt or the format changed.</exception>
-        private void LoadNpkHeader()
+        /// <exception cref="System.IO.EndOfStreamException">Unexpected end of file.</exception>
+        /// <exception cref="System.IO.IOException">I/O error.</exception>
+        /// <exception cref="DFO.Npk.NpkException">The file is corrupt or the format has changed.</exception>
+        private void LoadNpkFileTable()
         {
+            // file starts with "NeoplePack_Bill\0" in ASCII
             try
             {
-                LoadNpkFileTable();
-
-                // TODO: Profile to determine whether to preload the metadata or get it on-demand.
-                foreach (KeyValuePair<NpkPath, NpkByteRange> pathLocationPair in m_imageFileLocations)
+                string dirListingHeader = "NeoplePack_Bill\0";
+                byte[] headerBuffer = new byte[dirListingHeader.Length];
+                m_npkStream.ReadOrDie(headerBuffer, headerBuffer.Length);
+                string headerString = Encoding.ASCII.GetString(headerBuffer);
+                if (!string.Equals(dirListingHeader, headerString, StringComparison.Ordinal))
                 {
-                    LoadSpriteFileMetaData(pathLocationPair.Key, pathLocationPair.Value);
+                    throw new NpkException("Did not find expected directory listing header.");
+                }
+
+                // Next is a 32-bit unsigned int that is the number of files packed in the .npk
+                uint numFiles = GetUnsigned32Le();
+
+                byte[] subNameBuffer = new byte[256];
+                // Next is a listing of all the files and their location inside the file.
+                for (uint fileIndex = 0; fileIndex < numFiles; fileIndex++)
+                {
+                    // First is a 32-bit unsigned int that is the byte offset in the .npk of where the file is located.
+                    uint absoluteLocation = GetUnsigned32Le();
+                    // Followed by the size of the file in bytes
+                    uint size = GetUnsigned32Le();
+                    // And then the path of the file, including the prefix indicating whether it is an image
+                    // (sprite/) or a sound (sounds/)
+                    // There are always 256 bytes to be read here.
+                    // Each byte read is XOR'ed with the corresponding byte in the key.
+                    // Then the bytes can be treated as a null-terminated ASCII string.
+                    m_npkStream.ReadOrDie(subNameBuffer, subNameBuffer.Length);
+
+                    for (int keyIndex = 0; keyIndex < subNameBuffer.Length; keyIndex++)
+                    {
+                        subNameBuffer[keyIndex] ^= s_key[keyIndex];
+                    }
+
+                    string subNameString = Encoding.ASCII.GetString(subNameBuffer);
+                    subNameString = subNameString.TrimEnd('\0');
+                    NpkPath pathWithPrefix = new NpkPath(subNameString);
+
+                    // That gives a path like sprite/character/gunner/effect/aerialdashattack.img
+                    // We need to strip off the sprite/ or sound/ prefix.
+                    // The following code assumes that a prefix of, say, sprite// or sprite\ is still valid.
+                    // If not, the code could be simplified.
+                    IList<NpkPath> pathComponents = pathWithPrefix.GetPathComponents();
+                    if (pathComponents.Count >= 1)
+                    {
+                        // Build up the NpkPath that is the same NpkPath but without the first component
+                        NpkPath pathWithoutPrefix = pathWithPrefix.StripPrefix();
+
+                        NpkByteRange fileLocation = new NpkByteRange(absoluteLocation, (int)size);
+                        if (pathComponents[0].Equals("sprite"))
+                        {
+                            m_imageFileLocations[pathWithoutPrefix] = fileLocation;
+                            m_imagesInFile[pathWithoutPrefix] = true;
+                        }
+                        else if (pathComponents[0].Equals("sounds"))
+                        {
+                            m_soundFileLocations[pathWithoutPrefix] = fileLocation;
+                        }
+                        else
+                        {
+                            ; // Not an image or a sound. Ignore it I guess, no sense throwing an exception.
+                            // Don't break any programs just because a new file type was added or something.
+                        }
+                    }
+                    else
+                    {
+                        ; // empty path? O_o Ignore it I guess.
+                    }
                 }
             }
             catch (EndOfStreamException ex)
@@ -121,152 +191,120 @@ namespace DFO.Npk
         }
 
         /// <summary>
-        /// Helper function that loads the first part of the .npk header. m_imagefileLocations and
-        /// m_soundFileLocations are loaded when this function completes. The stream's read pointer will
-        /// be right after the file table part of the header after completion. This function is only
-        /// intended to be called from LoadNpkHeader().
+        /// Preloads frame metadata for all .img files in the NPK.
+        /// If the metadata has already been loaded, does nothing.
+        /// Metadata for an .img's frames are loaded on demand otherwise.
         /// </summary>
-        /// <exception cref="System.IO.EndOfStreamException">Unexpected end of file.</exception>
-        /// <exception cref="System.IO.IOException">I/O error.</exception>
-        private void LoadNpkFileTable()
+        /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
+        /// <exception cref="Dfo.Npk.NpkException">The .npk file is corrupt or the format changed.</exception>
+        public void PreLoadAllSpriteFrameMetadata()
         {
-            // file starts with "NeoplePack_Bill\0" in ASCII
-            string dirListingHeader = "NeoplePack_Bill\0";
-            byte[] headerBuffer = new byte[dirListingHeader.Length];
-            m_npkStream.ReadOrDie(headerBuffer, headerBuffer.Length);
-            string headerString = Encoding.ASCII.GetString(headerBuffer);
-            if (!string.Equals(dirListingHeader, headerString, StringComparison.Ordinal))
+            foreach (KeyValuePair<NpkPath, NpkByteRange> pathLocationPair in m_imageFileLocations)
             {
-                throw new NpkException("Did not find expected directory listing header.");
-            }
-
-            // Next is a 32-bit unsigned int that is the number of files packed in the .npk
-            uint numFiles = GetUnsigned32Le();
-
-            byte[] subNameBuffer = new byte[256];
-            // Next is a listing of all the files and their location inside the file.
-            for (uint fileIndex = 0; fileIndex < numFiles; fileIndex++)
-            {
-                // First is a 32-bit unsigned int that is the byte offset in the .npk of where the file is located.
-                uint absoluteLocation = GetUnsigned32Le();
-                // Followed by the size of the file in bytes
-                uint size = GetUnsigned32Le();
-                // And then the path of the file, including the prefix indicating whether it is an image
-                // (sprite/) or a sound (sounds/)
-                // There are always 256 bytes to be read here.
-                // Each byte read is XOR'ed with the corresponding byte in the key.
-                // Then the bytes can be treated as a null-terminated ASCII string.
-                m_npkStream.ReadOrDie(subNameBuffer, subNameBuffer.Length);
-
-                for (int keyIndex = 0; keyIndex < subNameBuffer.Length; keyIndex++)
-                {
-                    subNameBuffer[keyIndex] ^= s_key[keyIndex];
-                }
-
-                string subNameString = Encoding.ASCII.GetString(subNameBuffer);
-                subNameString = subNameString.TrimEnd('\0');
-                NpkPath pathWithPrefix = new NpkPath(subNameString);
-
-                // That gives a path like sprite/character/gunner/effect/aerialdashattack.img
-                // We need to strip off the sprite/ or sound/ prefix.
-                // The following code assumes that a prefix of, say, sprite// or sprite\ is still valid.
-                // If not, the code could be simplified.
-                IList<NpkPath> pathComponents = pathWithPrefix.GetPathComponents();
-                if (pathComponents.Count >= 1)
-                {
-                    // Build up the NpkPath that is the same NpkPath but without the first component
-                    NpkPath pathWithoutPrefix = pathWithPrefix.StripPrefix();
-
-                    NpkByteRange fileLocation = new NpkByteRange(absoluteLocation, (int)size);
-                    if (pathComponents[0].Equals("sprite"))
-                    {
-                        m_imageFileLocations[pathWithoutPrefix] = fileLocation;
-                    }
-                    else if (pathComponents[0].Equals("sounds"))
-                    {
-                        m_soundFileLocations[pathWithoutPrefix] = fileLocation;
-                    }
-                    else
-                    {
-                        ; // Not an image or a sound. Ignore it I guess, no sense throwing an exception.
-                        // Don't break any programs just because a new file type was added or something.
-                    }
-                }
-                else
-                {
-                    ; // empty path? O_o Ignore it I guess.
-                }
+                LoadSpriteFileMetaData(pathLocationPair.Key, pathLocationPair.Value);
             }
         }
 
         /// <summary>
-        /// Helper function that loads a sprite file's metadata, setting its value in m_images and
+        /// Preloads frame metadata for the .img file with the given path without a leading sprite/.
+        /// If the metadata has already been loaded, does nothing.
+        /// Metadata for an .img's frames are loaded on demand otherwise.
+        /// </summary>
+        /// <param name="spriteFilePath">NPK path of the .img file to preload. Must not contain a leading sprite/</param>
+        /// <exception cref="System.IO.FileNotFoundException">There is no .img file in the NPK with the given path.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
+        /// <exception cref="Dfo.Npk.NpkException">The .npk file is corrupt or the format changed.</exception>
+        public void PreLoadSpriteMetadata(NpkPath spriteFilePath)
+        {
+            NpkByteRange spriteFileLocation;
+            if (!m_imageFileLocations.TryGetValue(spriteFilePath, out spriteFileLocation))
+            {
+                throw new FileNotFoundException(string.Format("There is no .img file with path {0} in this NPK.", spriteFilePath));
+            }
+
+            LoadSpriteFileMetaData(spriteFilePath, spriteFileLocation);
+        }
+
+        /// <summary>
+        /// Loads a sprite file's metadata, setting its value in m_images and
         /// m_frameLocations. The .npk file is assumed to be open.
         /// </summary>
         /// <exception cref="System.IO.IOException">I/O error.</exception>
-        /// <exception cref="System.IO.EndOfStreamException">Unexpected end of file.</exception>
-        /// <exception cref="Dfo.Parser.NpkException">The .npk file appears to be corrupt.</exception>
+        /// <exception cref="Dfo.Npk.NpkException">The .npk file appears to be corrupt or the format has changed.</exception>
         private void LoadSpriteFileMetaData(NpkPath spriteFilePath, NpkByteRange spriteFileLocation)
         {
-            // Seek to the sprite file's location in the .npk
-            Seek(spriteFileLocation.FileOffset, SeekOrigin.Begin);
-
-            // .img files begin with "Neople Img File\0" in ASCII
-            string imageFileHeader = "Neople Img File\0";
-            byte[] headerBuffer = new byte[imageFileHeader.Length];
-            m_npkStream.ReadOrDie(headerBuffer, headerBuffer.Length);
-            string headerString = Encoding.ASCII.GetString(headerBuffer);
-            if (!string.Equals(imageFileHeader, headerString, StringComparison.Ordinal))
+            // If already loaded, return
+            if (m_frames.ContainsKey(spriteFilePath))
             {
-                throw new NpkException("Did not find expected image file header.");
+                return;
             }
 
-            // Don't know what these 4 bytes, 4 bytes, and 4 bytes are
-            uint unknown1 = GetUnsigned32Le();
-            uint unknown2 = GetUnsigned32Le();
-            uint unknown3 = GetUnsigned32Le();
-
-            // 32-bit unsigned int - number of frames in the .img file
-            uint numFrames = GetUnsigned32Le();
-
-            List<FrameInfo> frames = new List<FrameInfo>((int)numFrames);
-            List<NpkByteRange> frameLocations = new List<NpkByteRange>((int)numFrames);
-
-            // Next is each frame's metadata, one after the other.
-            for (uint frameIndex = 0; frameIndex < numFrames; frameIndex++)
+            try
             {
-                FrameInfo frame = ReadFrameMetadata();
-                frames.Add(frame);
-            }
+                // Seek to the sprite file's location in the .npk
+                Seek(spriteFileLocation.FileOffset, SeekOrigin.Begin);
 
-            // Next is each non-reference frame's pixel data, one after the other.
-            for (uint frameIndex = 0; frameIndex < numFrames; frameIndex++)
+                // .img files begin with "Neople Img File\0" in ASCII
+                string imageFileHeader = "Neople Img File\0";
+                byte[] headerBuffer = new byte[imageFileHeader.Length];
+                m_npkStream.ReadOrDie(headerBuffer, headerBuffer.Length);
+                string headerString = Encoding.ASCII.GetString(headerBuffer);
+                if (!string.Equals(imageFileHeader, headerString, StringComparison.Ordinal))
+                {
+                    throw new NpkException("Did not find expected image file header.");
+                }
+
+                // Don't know what these 4 bytes, 4 bytes, and 4 bytes are
+                uint unknown1 = GetUnsigned32Le();
+                uint unknown2 = GetUnsigned32Le();
+                uint unknown3 = GetUnsigned32Le();
+
+                // 32-bit unsigned int - number of frames in the .img file
+                uint numFrames = GetUnsigned32Le();
+
+                List<FrameInfo> frames = new List<FrameInfo>((int)numFrames);
+                List<NpkByteRange> frameLocations = new List<NpkByteRange>((int)numFrames);
+
+                // Next is each frame's metadata, one after the other.
+                for (uint frameIndex = 0; frameIndex < numFrames; frameIndex++)
+                {
+                    FrameInfo frame = ReadFrameMetadata();
+                    frames.Add(frame);
+                }
+
+                // Next is each non-reference frame's pixel data, one after the other.
+                for (uint frameIndex = 0; frameIndex < numFrames; frameIndex++)
+                {
+                    FrameInfo frame = frames[(int)frameIndex];
+                    if (frame.LinkFrame != null)
+                    {
+                        // Link frames have no pixel data
+                        // Could set this to referenced frame's data to simply code elsewhere?
+                        frameLocations.Add(new NpkByteRange(0, 0));
+                        continue;
+                    }
+
+                    NpkByteRange frameByteRange;
+                    if (frame.IsCompressed)
+                    {
+                        frameByteRange = new NpkByteRange(m_npkStream.Position, frame.CompressedLength);
+                    }
+                    else
+                    {
+                        frameByteRange = new NpkByteRange(m_npkStream.Position, frame.CompressedLength / 2);
+                    }
+
+                    frameLocations.Add(frameByteRange);
+                    Seek(frameByteRange.Size, SeekOrigin.Current);
+                }
+
+                m_frames[spriteFilePath] = frames;
+                m_frameLocations[spriteFilePath] = frameLocations;
+            }
+            catch (EndOfStreamException ex)
             {
-                FrameInfo frame = frames[(int)frameIndex];
-                if (frame.LinkFrame != null)
-                {
-                    // Link frames have no pixel data
-                    // Could set this to referenced frame's data to simply code elsewhere?
-                    frameLocations.Add(new NpkByteRange(0, 0));
-                    continue;
-                }
-
-                NpkByteRange frameByteRange;
-                if (frame.IsCompressed)
-                {
-                    frameByteRange = new NpkByteRange(m_npkStream.Position, frame.CompressedLength);
-                }
-                else
-                {
-                    frameByteRange = new NpkByteRange(m_npkStream.Position, frame.CompressedLength / 2);
-                }
-
-                frameLocations.Add(frameByteRange);
-                Seek(frameByteRange.Size, SeekOrigin.Current);
+                throw new NpkException("Unexpected end of file.", ex);
             }
-
-            m_images[spriteFilePath] = frames;
-            m_frameLocations[spriteFilePath] = frameLocations;
         }
 
         /// <summary>
@@ -275,7 +313,7 @@ namespace DFO.Npk
         /// <returns></returns>
         /// <exception cref="System.IO.IOException">I/O error.</exception>
         /// <exception cref="System.IO.EndOfStreamException">Unexpected end of file.</exception>
-        /// <exception cref="Dfo.Parser.NpkException">The .npk appears to be corrupt.</exception>
+        /// <exception cref="Dfo.Npk.NpkException">The .npk appears to be corrupt.</exception>
         private FrameInfo ReadFrameMetadata()
         {
             uint mode = GetUnsigned32Le();
@@ -333,7 +371,7 @@ namespace DFO.Npk
         /// <param name="origin"></param>
         /// <returns></returns>
         /// <exception cref="System.IO.IOException">An I/O error occurred or the stream does not support seeking.</exception>
-        /// <exception cref="Dfo.Parser.NpkException">Tried to seek before the beginning of the file.</exception>
+        /// <exception cref="Dfo.Npk.NpkException">Tried to seek before the beginning of the file.</exception>
         private long Seek(long absolutePosition, SeekOrigin origin)
         {
             try
@@ -351,7 +389,7 @@ namespace DFO.Npk
         }
 
         /// <summary>
-        /// 
+        /// Loads the pixels of a frame.
         /// </summary>
         /// <param name="imgPath">The Npk Path of the .img file, WITHOUT the leading sprite/</param>
         /// <param name="frameIndex"></param>
@@ -359,21 +397,18 @@ namespace DFO.Npk
         /// <exception cref="System.IO.FileNotFoundException">The img file does not exist in this .npk file
         /// or no frame with the given index exists in the img file.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
-        /// <exception cref="Dfo.Parser.NpkException">The .npk file is corrupt or the format changed.</exception>
+        /// <exception cref="Dfo.Npk.NpkException">The .npk file is corrupt or the format changed.</exception>
         public Image GetImage(NpkPath imgPath, int frameIndex)
         {
             imgPath.ThrowIfNull("imgPath");
 
             try
             {
-                if (!m_images.ContainsKey(imgPath))
-                {
-                    throw new FileNotFoundException("{0} does not exist in {1}.".F(imgPath, PathOfNpkFile));
-                }
+                PreLoadSpriteMetadata(imgPath);
 
-                IList<FrameInfo> imgFrames = m_images[imgPath];
+                IList<FrameInfo> imgFrames = m_frames[imgPath];
 
-                if (frameIndex >= imgFrames.Count)
+                if (frameIndex >= imgFrames.Count || frameIndex < 0)
                 {
                     throw new FileNotFoundException("Cannot get frame index {0} of {1}. It only has {2} frames."
                         .F(frameIndex, imgPath, imgFrames.Count));
