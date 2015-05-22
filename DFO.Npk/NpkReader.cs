@@ -13,7 +13,9 @@ namespace DFO.Npk
 {
     public class NpkReader : IImageSource, IDisposable
     {
-        private FileStream m_npkStream;
+        private Stream m_npkStream;
+        private bool m_disposeStream;
+
         private byte[] m_intBuffer = new byte[4];
 
         private static string s_keyString = "puchikon@neople dungeon and fighter DNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNF\0";
@@ -40,10 +42,10 @@ namespace DFO.Npk
         // Initialized in constructor
         public DFO.Utilities.IReadOnlyDictionary<NpkPath, SoundInfo> Sounds { get; private set; }
 
-        public string PathOfNpkFile { get; private set; }
-
         /// <summary>
-        /// Opens the NPK file and reads the metadata for each packed file and each frame in each .img file.
+        /// Opens the NPK file and reads the metadata for each packed file. Metadata for the frames in the
+        /// packed .img files are lazy loaded and can be preloaded with PreLoadAllSpriteFrameMetadata or
+        /// PreLoadSpriteMetadata.
         /// </summary>
         /// <param name="pathOfNpkFile"></param>
         /// <exception cref="System.ArgumentNullException"><paramref name="pathOfNpkFile"/> is null.</exception>
@@ -54,16 +56,55 @@ namespace DFO.Npk
         /// permission or the file is actually a directory.</exception>
         public NpkReader(string pathOfNpkFile)
         {
+            pathOfNpkFile.ThrowIfNull("pathOfNpkFile");
+            m_npkStream = OpenNpkFile(pathOfNpkFile);
+            m_disposeStream = true;
+            Initialize();
+        }
+
+        /// <summary>
+        /// Opens the NPK file and reads the metadata for each packed file. Metadata for the frames in the
+        /// packed .img files are lazy loaded and can be preloaded with PreLoadAllSpriteFrameMetadata or
+        /// PreLoadSpriteMetadata.
+        /// </summary>
+        /// <param name="npkStream">A seekable stream of an NPK file, with the read pointer at the beginning of the file.
+        /// The stream will be disposed when this object is disposed</param>
+        /// <exception cref="System.ArgumentNullException"><paramref name="npkStream"/> is null.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
+        /// <exception cref="Dfo.Npk.NpkException">The .npk file is corrupt or the format changed.</exception>
+        public NpkReader(Stream npkStream)
+            : this(npkStream, disposeStream: true)
+        {
+            
+        }
+
+        /// <summary>
+        /// Opens the NPK file and reads the metadata for each packed file. Metadata for the frames in the
+        /// packed .img files are lazy loaded and can be preloaded with PreLoadAllSpriteFrameMetadata or
+        /// PreLoadSpriteMetadata.
+        /// </summary>
+        /// <param name="npkStream">A seekable stream of an NPK file, with the read pointer at the beginning of the file.
+        /// The stream will be disposed when this object is disposed</param>
+        /// <param name="disposeStream">If true, dispose the stream when this object is disposed.</param>
+        /// <exception cref="System.ArgumentNullException"><paramref name="npkStream"/> is null.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
+        /// <exception cref="Dfo.Npk.NpkException">The .npk file is corrupt or the format changed.</exception>
+        public NpkReader(Stream npkStream, bool disposeStream)
+        {
+            npkStream.ThrowIfNull("npkStream");
+            m_npkStream = npkStream;
+            m_disposeStream = disposeStream;
+            Initialize();
+        }
+
+        private void Initialize()
+        {
             try
             {
-                pathOfNpkFile.ThrowIfNull("pathOfNpkFile");
-                PathOfNpkFile = pathOfNpkFile;
-
                 Frames = new DeepReadOnlyDictionary<NpkPath, IList<FrameInfo>, System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>>(
                     m_frames, (IList<FrameInfo> mutableList) => new System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>(mutableList));
                 Sounds = new ReadOnlyDictionary<NpkPath, SoundInfo>(m_sounds);
 
-                m_npkStream = OpenNpkFile();
                 LoadNpkFileTable();
             }
             catch (Exception)
@@ -77,15 +118,16 @@ namespace DFO.Npk
         /// Returns a file stream from opening the .npk file.
         /// </summary>
         /// <returns></returns>
+        /// <param name="pathOfNpkFile"></param>
         /// <exception cref="System.IO.FileNotFoundException">The .npk file does not exist.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
         /// <exception cref="System.UnauthorizedAccessException">The caller does not have the required
         /// permission or the file is actually a directory.</exception>
-        private FileStream OpenNpkFile()
+        private FileStream OpenNpkFile(string pathOfNpkFile)
         {
             try
             {
-                return File.Open(PathOfNpkFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                return File.Open(pathOfNpkFile, FileMode.Open, FileAccess.Read, FileShare.Read);
             }
             catch (Exception ex)
             {
@@ -93,7 +135,7 @@ namespace DFO.Npk
                 if (ex is ArgumentException || ex is PathTooLongException || ex is DirectoryNotFoundException
                 || ex is NotSupportedException)
                 {
-                    throw new FileNotFoundException("{0} does not exist.".F(PathOfNpkFile), PathOfNpkFile, ex);
+                    throw new FileNotFoundException("{0} does not exist.".F(pathOfNpkFile), pathOfNpkFile, ex);
                 }
                 else
                 {
@@ -380,7 +422,7 @@ namespace DFO.Npk
             }
             catch (NotSupportedException ex)
             {
-                throw new IOException("{0} does not support seeking.".F(PathOfNpkFile), ex);
+                throw new IOException("The NPK stream does not support seeking.", ex);
             }
             catch (ArgumentException)
             {
@@ -561,7 +603,7 @@ namespace DFO.Npk
 
         public void Dispose()
         {
-            if (m_npkStream != null)
+            if (m_npkStream != null && m_disposeStream)
             {
                 m_npkStream.Dispose();
             }
