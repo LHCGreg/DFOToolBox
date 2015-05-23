@@ -46,6 +46,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NpkReader.LazyFramesReadOnlyDictionary.cs" />
     <Compile Include="NpkByteRange.cs" />
     <Compile Include="NpkException.cs" />
     <Compile Include="NpkReader.cs" />

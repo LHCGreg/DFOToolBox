@@ -11,7 +11,7 @@ using DFO.Common.Images;
 
 namespace DFO.Npk
 {
-    public class NpkReader : IImageSource, IDisposable
+    public partial class NpkReader : IImageSource, IDisposable
     {
         private Stream m_npkStream;
         private bool m_disposeStream;
@@ -27,16 +27,17 @@ namespace DFO.Npk
 
         private Dictionary<NpkPath, NpkByteRange> m_soundFileLocations = new Dictionary<NpkPath, NpkByteRange>();
 
-        private Dictionary<NpkPath, IList<NpkByteRange>> m_frameLocations = new Dictionary<NpkPath, IList<NpkByteRange>>();
+        private Dictionary<NpkPath, List<NpkByteRange>> m_frameLocations = new Dictionary<NpkPath, List<NpkByteRange>>();
 
         // If this is re-set, Images must be updated to point to the new value.
-        private Dictionary<NpkPath, IList<FrameInfo>> m_frames = new Dictionary<NpkPath, IList<FrameInfo>>();
+        private Dictionary<NpkPath, List<FrameInfo>> m_frames = new Dictionary<NpkPath, List<FrameInfo>>();
 
         // Initialized in constructor
         /// <summary>
-        /// Dictinoary of NpkPath to frame metadata. Paths are not present here if they have not been loaded yet.
+        /// Dictionary of NpkPath to frame metadata. Frame metadata is automatically loaded for requested paths if they
+        /// have not been loaded yet.
         /// </summary>
-        public DFO.Utilities.IReadOnlyDictionary<NpkPath, System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>> Frames { get; private set; }
+        public System.Collections.Generic.IReadOnlyDictionary<NpkPath, System.Collections.Generic.IReadOnlyCollection<FrameInfo>> Frames { get; private set; }
 
         private IDictionary<NpkPath, SoundInfo> m_sounds = new Dictionary<NpkPath, SoundInfo>();
         // Initialized in constructor
@@ -101,8 +102,7 @@ namespace DFO.Npk
         {
             try
             {
-                Frames = new DeepReadOnlyDictionary<NpkPath, IList<FrameInfo>, System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>>(
-                    m_frames, (IList<FrameInfo> mutableList) => new System.Collections.ObjectModel.ReadOnlyCollection<FrameInfo>(mutableList));
+                Frames = new LazyFramesReadOnlyDictionary(this);
                 Sounds = new ReadOnlyDictionary<NpkPath, SoundInfo>(m_sounds);
 
                 LoadNpkFileTable();
