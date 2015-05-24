@@ -23,7 +23,7 @@ namespace DFO.Npk
 
         private Dictionary<NpkPath, NpkByteRange> m_imageFileLocations = new Dictionary<NpkPath, NpkByteRange>();
         private Dictionary<NpkPath, bool> m_imagesInFile = new Dictionary<NpkPath,bool>();
-        public System.Collections.Generic.IReadOnlyDictionary<NpkPath, bool> Images { get { return m_imagesInFile; } }
+        public IReadOnlyDictionary<NpkPath, bool> Images { get { return m_imagesInFile; } }
 
         private Dictionary<NpkPath, NpkByteRange> m_soundFileLocations = new Dictionary<NpkPath, NpkByteRange>();
 
@@ -37,11 +37,14 @@ namespace DFO.Npk
         /// Dictionary of NpkPath to frame metadata. Frame metadata is automatically loaded for requested paths if they
         /// have not been loaded yet.
         /// </summary>
-        public System.Collections.Generic.IReadOnlyDictionary<NpkPath, System.Collections.Generic.IReadOnlyCollection<FrameInfo>> Frames { get; private set; }
+        public IReadOnlyDictionary<NpkPath, IReadOnlyCollection<FrameInfo>> Frames { get; private set; }
 
         private IDictionary<NpkPath, SoundInfo> m_sounds = new Dictionary<NpkPath, SoundInfo>();
         // Initialized in constructor
-        public DFO.Utilities.IReadOnlyDictionary<NpkPath, SoundInfo> Sounds { get; private set; }
+        /// <summary>
+        /// Not currently populated.
+        /// </summary>
+        public IReadOnlyDictionary<NpkPath, SoundInfo> Sounds { get; private set; }
 
         /// <summary>
         /// Opens the NPK file and reads the metadata for each packed file. Metadata for the frames in the
@@ -103,7 +106,7 @@ namespace DFO.Npk
             try
             {
                 Frames = new LazyFramesReadOnlyDictionary(this);
-                Sounds = new ReadOnlyDictionary<NpkPath, SoundInfo>(m_sounds);
+                Sounds = new Dictionary<NpkPath, SoundInfo>(m_sounds);
 
                 LoadNpkFileTable();
             }

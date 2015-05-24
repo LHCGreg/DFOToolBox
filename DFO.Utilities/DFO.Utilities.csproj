@@ -35,12 +35,8 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeepReadOnlyCollection.cs" />
-    <Compile Include="DeepReadOnlyDictionary.cs" />
     <Compile Include="IConstable.cs" />
-    <Compile Include="IReadOnlyDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadOnlyDictionary.cs" />
     <Compile Include="UtilityExtensions.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>

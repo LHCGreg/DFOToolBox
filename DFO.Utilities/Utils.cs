@@ -149,22 +149,5 @@ namespace DFO.Utilities
                 return ret;
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TKey"></typeparam>
-        /// <typeparam name="TValue"></typeparam>
-        /// <typeparam name="TConstValue"></typeparam>
-        /// <param name="dictToWrap"></param>
-        /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException"><paramref name="dictToWrap"/> is null.</exception>
-        public static DeepReadOnlyDictionary<TKey, TValue, TConstValue>
-            CreateConstDictionary<TKey, TValue, TConstValue>(IDictionary<TKey, TValue> dictToWrap)
-            where TValue : IConstable<TConstValue>
-        {
-            return new DeepReadOnlyDictionary<TKey, TValue, TConstValue>(dictToWrap,
-                (TValue value) => value.AsConst());
-        }
     }
 }

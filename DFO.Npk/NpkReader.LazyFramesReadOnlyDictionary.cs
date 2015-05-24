@@ -16,7 +16,7 @@ namespace DFO.Npk
         /// <summary>
         /// Lazily loads frame metadata as needed, presenting a convenient interface.
         /// </summary>
-        internal class LazyFramesReadOnlyDictionary : System.Collections.Generic.IReadOnlyDictionary<NpkPath, System.Collections.Generic.IReadOnlyCollection<FrameInfo>>
+        internal class LazyFramesReadOnlyDictionary : IReadOnlyDictionary<NpkPath, IReadOnlyCollection<FrameInfo>>
         {
             private NpkReader m_npk;
 
