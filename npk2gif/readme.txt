@@ -12,6 +12,8 @@ npk2gif -npk C:\Neople\DFO\ImagePacks2\sprite_monster_impossible_bakal.NPK -img 
 
 
 
+npk2gif is open source and is licensed under the Apache License 2.0 (license.txt). You can find the source code at https://github.com/LHCGreg/DFOToolBox.
+
 npk2gif uses the following software:
 
 GraphicsMagick.NET (https://graphicsmagick.codeplex.com/license), licensed under the Apache License 2.0 (graphicsmagick_net_license.txt).
