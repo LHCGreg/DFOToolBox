@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Non-DFO related utility library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("")]
+[assembly: AssemblyProduct("DFO Toolbox")]
 [assembly: AssemblyCopyright("Copyright © LHCGreg 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

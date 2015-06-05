@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "npk2gif", "npk2gif\npk2gif.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Common.Tests", "DFO.Common.Tests\DFO.Common.Tests.csproj", "{016B332A-BEF3-496F-A896-3C5F2BC41238}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFOToolbox", "DFOToolbox\DFOToolbox.csproj", "{F745AB63-3DCF-48E3-AD87-93FE67012F72}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{016B332A-BEF3-496F-A896-3C5F2BC41238}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{016B332A-BEF3-496F-A896-3C5F2BC41238}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{016B332A-BEF3-496F-A896-3C5F2BC41238}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F745AB63-3DCF-48E3-AD87-93FE67012F72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F745AB63-3DCF-48E3-AD87-93FE67012F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F745AB63-3DCF-48E3-AD87-93FE67012F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F745AB63-3DCF-48E3-AD87-93FE67012F72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Makes animated GIFs from DFO NPK files")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("npk2gif")]
+[assembly: AssemblyProduct("DFO Toolbox")]
 [assembly: AssemblyCopyright("Copyright © LHCGreg 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

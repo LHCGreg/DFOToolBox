@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Library for making animated GIFs from DFO images")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("")]
+[assembly: AssemblyProduct("DFO Toolbox")]
 [assembly: AssemblyCopyright("Copyright © LHCGreg 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -1,0 +1,251 @@
+﻿<Window x:Class="Thing.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="600" Width="1000">
+    <Window.CommandBindings>
+        <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"></CommandBinding>
+    </Window.CommandBindings>
+    <DockPanel Background="Red">
+        <Menu DockPanel.Dock="Top" Height="27" VerticalAlignment="Top" >
+            <MenuItem Name="mnu_file" Header="File">
+                <MenuItem Name="mnu_open" Header="Open" Command="Open"/>
+                <MenuItem Name="mnu_exit" Header="Exit" Click="mnu_exit_click" />
+            </MenuItem>
+        </Menu>
+        <ListBox DockPanel.Dock="Left" Width="200" Background="Green" HorizontalAlignment="Left">
+            <!-- TODO: Sizing -->
+            <!-- TOOO: Icon?-->
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+            <ListBoxItem>Hello</ListBoxItem>
+        </ListBox>
+        <ListBox DockPanel.Dock="Top"  Height="200" Background="Purple" VerticalAlignment="Top">
+            <ListBoxItem>
+                <!-- TODO: Make spacebar go to checkbox -->
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center" />
+                    <Label>xxx 0 (365, 400) 44x50</Label>
+                </StackPanel>
+            </ListBoxItem>
+        </ListBox>
+        <DockPanel Background="Azure" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></DockPanel>
+        <!--<Grid ShowGridLines="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="4" Background="Red">
+                <ListBox Background="Green"></ListBox>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Background="Blue">
+                
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="1" Grid.RowSpan="3" Grid.ColumnSpan="3" Background="Purple">
+                
+            </StackPanel>
+            --><!--<TextBox Background="Blue" Height="30" VerticalAlignment="Top"></TextBox>--><!--
+        </Grid>-->
+    </DockPanel>
+</Window>
