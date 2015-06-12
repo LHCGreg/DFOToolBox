@@ -67,6 +67,8 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <DockPanel Background="Azure" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></DockPanel>
+        <Canvas Background="CornflowerBlue" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+            <Image Name="CurrentFrameImage" />
+        </Canvas>
     </DockPanel>
 </Window>

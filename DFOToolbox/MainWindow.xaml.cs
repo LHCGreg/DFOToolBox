@@ -159,7 +159,60 @@ namespace DFOToolbox
 
         private void SelectedFrameChanged(object sender, EventArgs e)
         {
-            // TODO
+            FrameMetadata frame = (FrameMetadata)FrameListViewSource.View.CurrentItem;
+            if (frame == null)
+            {
+                CurrentFrameImage.Source = null;
+                CurrentFrameImage.Height = double.NaN;
+                CurrentFrameImage.Width = double.NaN;
+                return;
+            }
+
+            InnerNpkFile selectedFile = (InnerNpkFile)InnerFileListViewSource.View.CurrentItem;
+
+            DFO.Common.Images.Image image = null;
+            try
+            {
+                image = _npk.GetImage(selectedFile.Path, frame.Index);
+            }
+            catch (Exception ex)
+            {
+                // TODO: Log this and maybe display something
+                CurrentFrameImage.Source = null;
+                CurrentFrameImage.Height = double.NaN;
+                CurrentFrameImage.Width = double.NaN;
+                return;
+            }
+
+            // RGBA -> BGRA (for little endian platforms), (BGRA for big endian platforms) - seems to not be reversed for little endian???
+            byte[] convertedBytes = new byte[image.PixelData.Length];
+            bool isLittleEndian = BitConverter.IsLittleEndian;
+
+            if (isLittleEndian)
+            {
+                for (int i = 0; i < image.PixelData.Length; i += 4)
+                {
+                    convertedBytes[i] = image.PixelData[i + 2]; // B
+                    convertedBytes[i + 1] = image.PixelData[i + 1]; // G
+                    convertedBytes[i + 2] = image.PixelData[i]; // R
+                    convertedBytes[i + 3] = image.PixelData[i + 3]; // A
+                }
+            }
+            else
+            {
+                for (int i = 0; i < image.PixelData.Length; i += 4)
+                {
+                    convertedBytes[i] = image.PixelData[i + 2]; // B
+                    convertedBytes[i + 1] = image.PixelData[i + 1]; // G
+                    convertedBytes[i + 2] = image.PixelData[i]; // R
+                    convertedBytes[i + 3] = image.PixelData[i + 3]; // A
+                }
+            }
+
+            BitmapSource bitmap = BitmapSource.Create(frame.Width, frame.Height, dpiX: 96, dpiY: 96, pixelFormat: PixelFormats.Bgra32, palette: null, pixels: convertedBytes, stride: 4 * frame.Width);
+            this.CurrentFrameImage.Source = bitmap;
+            this.CurrentFrameImage.Width = frame.Width;
+            this.CurrentFrameImage.Height = frame.Height;
         }
 
         public void Dispose()
