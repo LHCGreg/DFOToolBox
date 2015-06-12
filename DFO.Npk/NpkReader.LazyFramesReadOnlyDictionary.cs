@@ -16,7 +16,7 @@ namespace DFO.Npk
         /// <summary>
         /// Lazily loads frame metadata as needed, presenting a convenient interface.
         /// </summary>
-        internal class LazyFramesReadOnlyDictionary : IReadOnlyDictionary<NpkPath, IReadOnlyCollection<FrameInfo>>
+        internal class LazyFramesReadOnlyDictionary : IReadOnlyDictionary<NpkPath, IReadOnlyList<FrameInfo>>
         {
             private NpkReader m_npk;
 
@@ -36,7 +36,7 @@ namespace DFO.Npk
                 get { return m_npk.Images.Keys; }
             }
 
-            public bool TryGetValue(NpkPath key, out IReadOnlyCollection<FrameInfo> value)
+            public bool TryGetValue(NpkPath key, out IReadOnlyList<FrameInfo> value)
             {
                 if (m_npk.Images.ContainsKey(key))
                 {
@@ -55,7 +55,7 @@ namespace DFO.Npk
             // and the debugger decides to evaluate this property
             [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             [DebuggerHidden]
-            public IEnumerable<IReadOnlyCollection<FrameInfo>> Values
+            public IEnumerable<IReadOnlyList<FrameInfo>> Values
             {
                 get
                 {
@@ -64,7 +64,7 @@ namespace DFO.Npk
                 }
             }
 
-            public IReadOnlyCollection<FrameInfo> this[NpkPath key]
+            public IReadOnlyList<FrameInfo> this[NpkPath key]
             {
                 get
                 {
@@ -83,12 +83,12 @@ namespace DFO.Npk
 
             public int Count { get { return m_npk.Images.Count; } }
 
-            public IEnumerator<KeyValuePair<NpkPath, IReadOnlyCollection<FrameInfo>>> GetEnumerator()
+            public IEnumerator<KeyValuePair<NpkPath, IReadOnlyList<FrameInfo>>> GetEnumerator()
             {
                 foreach (NpkPath imgPath in m_npk.Images.Keys)
                 {
                     m_npk.PreLoadSpriteMetadata(imgPath);
-                    yield return new KeyValuePair<NpkPath, IReadOnlyCollection<FrameInfo>>(imgPath, m_npk.m_frames[imgPath]);
+                    yield return new KeyValuePair<NpkPath, IReadOnlyList<FrameInfo>>(imgPath, m_npk.m_frames[imgPath]);
                 }
             }
 

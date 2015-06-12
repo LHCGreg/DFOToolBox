@@ -37,7 +37,7 @@ namespace DFO.Npk
         /// Dictionary of NpkPath to frame metadata. Frame metadata is automatically loaded for requested paths if they
         /// have not been loaded yet.
         /// </summary>
-        public IReadOnlyDictionary<NpkPath, IReadOnlyCollection<FrameInfo>> Frames { get; private set; }
+        public IReadOnlyDictionary<NpkPath, IReadOnlyList<FrameInfo>> Frames { get; private set; }
 
         private IDictionary<NpkPath, SoundInfo> m_sounds = new Dictionary<NpkPath, SoundInfo>();
         // Initialized in constructor
