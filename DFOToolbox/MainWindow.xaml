@@ -34,7 +34,7 @@
 
         </CollectionViewSource>
     </Window.Resources>
-    <DockPanel Background="Red">
+    <DockPanel>
         <Menu DockPanel.Dock="Top" Height="27" VerticalAlignment="Top" >
             <MenuItem Name="mnu_file" Header="File">
                 <MenuItem Name="mnu_open" Header="Open" Command="Open"/>
@@ -42,7 +42,7 @@
                 <MenuItem Name="mnu_exit" Header="Exit" Click="mnu_exit_click" />
             </MenuItem>
         </Menu>
-        <ListBox DockPanel.Dock="Left" Width="200" Background="Green" HorizontalAlignment="Left"
+        <ListBox DockPanel.Dock="Left" Width="200" HorizontalAlignment="Left"
                  ItemsSource="{Binding Source={StaticResource InnerFileListView}}"
                  IsSynchronizedWithCurrentItem="True"
                  DisplayMemberPath="Name"
@@ -50,7 +50,7 @@
             <!-- TODO: Sizing -->
             <!-- TOOO: Icon?-->
         </ListBox>
-        <ListBox DockPanel.Dock="Top"  Height="200" Background="Purple" VerticalAlignment="Top"
+        <ListBox DockPanel.Dock="Top"  Height="200" VerticalAlignment="Top"
                  ItemsSource="{Binding Source={StaticResource FrameListView}}"
                  IsSynchronizedWithCurrentItem="True"
                  SelectedIndex="-1">
@@ -67,7 +67,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Canvas Background="CornflowerBlue" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+        <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
             <Image Name="CurrentFrameImage" />
         </Canvas>
     </DockPanel>
