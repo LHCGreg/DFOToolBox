@@ -1,0 +1,3 @@
+﻿Setup required to run these tests:
+
+A full set of ImagePacks2 NPK files at (by default) C:\Neople\DFO\ImagePacks2. The path can be changed in the app.config.
