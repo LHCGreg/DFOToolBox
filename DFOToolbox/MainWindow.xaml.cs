@@ -102,6 +102,12 @@ namespace DFOToolbox
                 if (imgName == null) continue; // TODO: Log this, something would have to be strange
                 InnerFileList.Add(new InnerNpkFile(name: imgName, path: imgPath.Path));
             }
+
+            // Select first .img
+            if (InnerFileList.Count > 0)
+            {
+                InnerFileListViewSource.View.MoveCurrentToFirst();
+            }
         }
 
         private void SelectedInnerFileChanged(object sender, EventArgs e)
@@ -154,6 +160,12 @@ namespace DFOToolbox
                 {
                     FrameList.Add(new FrameMetadata(frame, frameIndex, linkFrameIndex: null));
                 }
+            }
+
+            // Select first frame
+            if (FrameList.Count > 0)
+            {
+                FrameListViewSource.View.MoveCurrentToFirst();
             }
         }
 
