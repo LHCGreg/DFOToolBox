@@ -48,8 +48,7 @@ namespace DFOToolbox
             FrameListViewSource.View.CurrentChanged += SelectedFrameChanged;
         }
 
-        // TODO: Make this a command instead of a direct click handler
-        private void mnu_exit_click(object sender, RoutedEventArgs e)
+        private void CloseCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.Close();
         }
@@ -187,7 +186,7 @@ namespace DFOToolbox
             {
                 image = _npk.GetImage(selectedFile.Path, frame.Index);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // TODO: Log this and maybe display something
                 CurrentFrameImage.Source = null;
@@ -197,6 +196,7 @@ namespace DFOToolbox
             }
 
             // RGBA -> BGRA (for little endian platforms), (BGRA for big endian platforms) - seems to not be reversed for little endian???
+            // TODO: Make NpkReader able to output in variable format so it doesn't need to be converted
             byte[] convertedBytes = new byte[image.PixelData.Length];
             bool isLittleEndian = BitConverter.IsLittleEndian;
 

@@ -7,6 +7,7 @@
         Name="ThisWindow">
     <Window.CommandBindings>
         <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"></CommandBinding>
+        <CommandBinding Command="Close" Executed="CloseCommandBinding_Executed"></CommandBinding>
     </Window.CommandBindings>
     <!-- Uncomment this and the modified CollectionViewSource elements below to see items in the designer -->
     <Window.Resources>
@@ -39,7 +40,7 @@
             <MenuItem Name="mnu_file" Header="File">
                 <MenuItem Name="mnu_open" Header="Open" Command="Open"/>
                 <Separator />
-                <MenuItem Name="mnu_exit" Header="Exit" Click="mnu_exit_click" />
+                <MenuItem Name="mnu_exit" Header="Exit" Command="Close" />
             </MenuItem>
         </Menu>
         <ListBox DockPanel.Dock="Left" Width="200" HorizontalAlignment="Left"
