@@ -1,6 +1,10 @@
 ﻿<Window x:Class="DFOToolbox.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:designer="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="designer"
+        xmlns:vm="clr-namespace:DFOToolbox"
         Title="DFO Toolbox" Height="600" Width="1000"
         Name="ThisWindow"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Self}}">
@@ -8,7 +12,12 @@
         <KeyBinding Key="O" Modifiers="Control" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommand}" />
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.QuickSaveAsPngCommand}" />
     </Window.InputBindings>
-    <DockPanel>
+    <Window.Resources>
+        <vm:DesignerMainWindowViewModel x:Key="DesignViewModel">
+            
+        </vm:DesignerMainWindowViewModel>
+    </Window.Resources>
+    <DockPanel designer:DataContext="{Binding Source={StaticResource DesignViewModel}}">
         <Menu DockPanel.Dock="Top" Height="27" VerticalAlignment="Top" >
             <MenuItem Header="File">
                 <MenuItem Header="Open" InputGestureText="Ctrl+O" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommandCanExecute}" />

@@ -19,7 +19,7 @@ using Microsoft.Win32;
 
 namespace DFOToolbox
 {
-    public class MainWindowViewModel : NotifyPropertyChangedBase, IDisposable
+    public class MainWindowViewModel : NotifyPropertyChangedBase, IMainWindowViewModel, IDisposable
     {
         private NpkReader _npk;
 
