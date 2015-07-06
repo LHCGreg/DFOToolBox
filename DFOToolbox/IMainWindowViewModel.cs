@@ -15,10 +15,10 @@ namespace DFOToolbox
         FrameList FrameList { get; set; }
         ImageSource CurrentFrameImage { get; set; }
 
-        DelegateCommand<string> OpenCommand { get; }
-        bool OpenCommandCanExecute { get; set; }
+        void Open(string npkPath);
+        bool CanOpen { get; set; }
 
-        DelegateCommand QuickSaveAsPngCommand { get; }
-        bool QuickSaveAsPngCommandCanExecute { get; set; }
+        void QuickSaveAsPng();
+        bool CanQuickSaveAsPng { get; set; }
     }
 }

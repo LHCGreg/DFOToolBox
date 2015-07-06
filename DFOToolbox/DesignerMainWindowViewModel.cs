@@ -15,10 +15,8 @@ namespace DFOToolbox
         public InnerNpkFileList InnerFileList { get; set; }
         public FrameList FrameList { get; set; }
         public ImageSource CurrentFrameImage { get; set; }
-        public DelegateCommand<string> OpenCommand { get; set; }
-        public bool OpenCommandCanExecute { get; set; }
-        public DelegateCommand QuickSaveAsPngCommand { get; set; }
-        public bool QuickSaveAsPngCommandCanExecute { get; set; }
+        public bool CanOpen { get; set; }
+        public bool CanQuickSaveAsPng { get; set; }
 
         public DesignerMainWindowViewModel()
         {
@@ -37,10 +35,18 @@ namespace DFOToolbox
             };
 
             CurrentFrameImage = null;
-            OpenCommand = new DelegateCommand<string>((path) => {});
-            OpenCommandCanExecute = true;
-            QuickSaveAsPngCommand = new DelegateCommand(() => { });
-            QuickSaveAsPngCommandCanExecute = true;
+            CanOpen = true;
+            CanQuickSaveAsPng = true;
+        }
+
+        public void Open(string npkPath)
+        {
+
+        }
+
+        public void QuickSaveAsPng()
+        {
+
         }
     }
 }

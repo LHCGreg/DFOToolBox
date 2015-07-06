@@ -44,48 +44,47 @@ namespace DFOToolbox
             set { _currentFrameImage = value; OnPropertyChanged(); }
         }
 
-        public DelegateCommand<string> OpenCommand { get; private set; }
-
         // Wiring up command objects' CanExecute() seems complicated and/or inefficient, so just expose a property for that.
-        // This way changes can be notified
-        private bool _openCommandCanExecute;
-        public bool OpenCommandCanExecute
+        // This way changes can be notified.
+
+        private bool _canOpen;
+        public bool CanOpen
         {
-            get { return _openCommandCanExecute; }
-            set { if (value != _openCommandCanExecute) { _openCommandCanExecute = value; OnPropertyChanged(); } }
+            get { return _canOpen; }
+            set { if (value != _canOpen) { _canOpen = value; OnPropertyChanged(); } }
         }
 
-        public const string PropertyNameOpenCommandCanExecute = "OpenCommandCanExecute";
+        public const string PropertyNameCanOpen = "CanOpen";
 
-        private bool CanOpen()
+        private bool GetCanOpen()
         {
             return true;
         }
 
         private void RefreshCanOpen()
         {
-            OpenCommandCanExecute = CanOpen();
+            CanOpen = GetCanOpen();
         }
 
-        public DelegateCommand QuickSaveAsPngCommand { get; private set; }
+        //public DelegateCommand QuickSaveAsPngCommand { get; private set; }
 
-        private bool _quickSaveAsPngCommandCanExecute;
-        public bool QuickSaveAsPngCommandCanExecute
+        private bool _canQuickSaveAsPng;
+        public bool CanQuickSaveAsPng
         {
-            get { return _quickSaveAsPngCommandCanExecute; }
-            set { if (value != _quickSaveAsPngCommandCanExecute) { _quickSaveAsPngCommandCanExecute = value; OnPropertyChanged(); } }
+            get { return _canQuickSaveAsPng; }
+            set { if (value != _canQuickSaveAsPng) { _canQuickSaveAsPng = value; OnPropertyChanged(); } }
         }
 
-        public const string PropertyNameSaveAsPngCommandCanExecute = "QuickSaveAsPngCommandCanExecute";
+        public const string PropertyNameCanQuickSaveAsPng = "CanQuickSaveAsPng";
 
-        private bool CanQuickSaveAsPng()
+        private bool GetCanQuickSaveAsPng()
         {
             return FrameList.Current != null;
         }
 
         private void RefreshCanQuickSaveAsPng()
         {
-            QuickSaveAsPngCommandCanExecute = CanQuickSaveAsPng();
+            CanQuickSaveAsPng = GetCanQuickSaveAsPng();
         }
 
         public MainWindowViewModel()
@@ -98,15 +97,17 @@ namespace DFOToolbox
             FrameList.CurrentChanged += SelectedFrameChanged;
             FrameList.CurrentChanged += (sender, e) => RefreshCanQuickSaveAsPng();
 
-            OpenCommand = new DelegateCommand<string>(OnOpen, npkPath => CanOpen());
-            OpenCommandCanExecute = CanOpen();
-
-            QuickSaveAsPngCommand = new DelegateCommand(OnQuickSaveAsPng, () => CanQuickSaveAsPng());
-            QuickSaveAsPngCommandCanExecute = CanQuickSaveAsPng();
+            CanOpen = GetCanOpen();
+            CanQuickSaveAsPng = GetCanQuickSaveAsPng();
         }
 
-        private void OnOpen(string npkPath)
+        public void Open(string npkPath)
         {
+            if (!CanOpen)
+            {
+                return;
+            }
+            
             // TODO: async?
             try
             {
@@ -254,9 +255,9 @@ namespace DFOToolbox
             CurrentFrameImage = BitmapSource.Create(frame.Width, frame.Height, dpiX: 96, dpiY: 96, pixelFormat: PixelFormats.Bgra32, palette: null, pixels: convertedBytes, stride: 4 * frame.Width);
         }
 
-        private void OnQuickSaveAsPng()
+        public void QuickSaveAsPng()
         {
-            if (!CanQuickSaveAsPng())
+            if (!GetCanQuickSaveAsPng())
             {
                 return;
             }

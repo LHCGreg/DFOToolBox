@@ -27,7 +27,7 @@ namespace DFOToolbox
 
         private bool CanQuickSaveAsPng()
         {
-            return ViewModel.QuickSaveAsPngCommandCanExecute;
+            return ViewModel.CanQuickSaveAsPng;
         }
 
         private void RefreshCanQuickSaveAsPng()
@@ -46,7 +46,7 @@ namespace DFOToolbox
 
         private bool CanOpen()
         {
-            return ViewModel.OpenCommandCanExecute;
+            return ViewModel.CanOpen;
         }
 
         private void RefreshCanOpen()
@@ -54,7 +54,7 @@ namespace DFOToolbox
             OpenCommandCanExecute = CanOpen();
         }
 
-        private async void OnOpen()
+        private void OnOpen()
         {
             if(!CanOpen())
             {
@@ -79,7 +79,7 @@ namespace DFOToolbox
             }
 
             string npkPath = filePicker.FileName;
-            await ViewModel.OpenCommand.Execute(npkPath);
+            ViewModel.Open(npkPath);
         }
 
         public DelegateCommand ExitCommand { get; private set; }
@@ -111,9 +111,9 @@ namespace DFOToolbox
             Window = window;
             ViewModel = viewModel;
             ViewModel.PropertyChanged += OnViewModelPropertyChanged;
-            OpenCommand = new DelegateCommand(OnOpen, CanOpen);
-            QuickSaveAsPngCommand = new DelegateCommand(async () => await ViewModel.QuickSaveAsPngCommand.Execute(), CanQuickSaveAsPng);
-            ExitCommand = new DelegateCommand(OnExit, CanExit);
+            OpenCommand = new DelegateCommand(OnOpen); // Don't give a delegate for if the command can execute, the menu item IsEnabled seems buggy when that's done...just manually bind IsEnabled
+            QuickSaveAsPngCommand = new DelegateCommand(() => ViewModel.QuickSaveAsPng());
+            ExitCommand = new DelegateCommand(OnExit);
 
             RefreshCanOpen();
             RefreshCanQuickSaveAsPng();
@@ -122,11 +122,11 @@ namespace DFOToolbox
 
         private void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == MainWindowViewModel.PropertyNameSaveAsPngCommandCanExecute)
+            if (e.PropertyName == MainWindowViewModel.PropertyNameCanQuickSaveAsPng)
             {
                 RefreshCanQuickSaveAsPng();
             }
-            else if (e.PropertyName == MainWindowViewModel.PropertyNameOpenCommandCanExecute)
+            else if (e.PropertyName == MainWindowViewModel.PropertyNameCanOpen)
             {
                 RefreshCanOpen();
             }
