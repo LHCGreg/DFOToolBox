@@ -62,9 +62,9 @@
       <Project>{f96de472-94ce-46dc-89fe-049207cc9541}</Project>
       <Name>DFO.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DFO.Gif\DFO.Gif.csproj">
+    <ProjectReference Include="..\DFO.Gif\DFO.Images.csproj">
       <Project>{44912ed2-024b-4ebf-b02f-910142c81e75}</Project>
-      <Name>DFO.Gif</Name>
+      <Name>DFO.Images</Name>
     </ProjectReference>
     <ProjectReference Include="..\DFO.Utilities\DFO.Utilities.csproj">
       <Project>{9aba11f3-61ac-4b40-8432-91b3fe9ca351}</Project>

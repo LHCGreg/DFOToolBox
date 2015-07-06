@@ -7,7 +7,7 @@ using DFO.Common;
 using DFO.Common.Images;
 using GraphicsMagick;
 
-namespace DFO.Gif
+namespace DFO.Images
 {
     public class GifMaker : IDisposable
     {

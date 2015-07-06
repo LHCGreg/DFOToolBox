@@ -7,8 +7,8 @@
     <ProjectGuid>{44912ED2-024B-4EBF-B02F-910142C81E75}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DFO.Gif</RootNamespace>
-    <AssemblyName>DFO.Gif</AssemblyName>
+    <RootNamespace>DFO.Images</RootNamespace>
+    <AssemblyName>DFO.Images</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>ae126a1f</NuGetPackageImportStamp>

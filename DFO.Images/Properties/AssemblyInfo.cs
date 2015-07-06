@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DFO.Gif")]
-[assembly: AssemblyDescription("Library for making animated GIFs from DFO images")]
+[assembly: AssemblyTitle("DFO.Images")]
+[assembly: AssemblyDescription("Library for exporting DFO images as various formats")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DFO Toolbox")]
