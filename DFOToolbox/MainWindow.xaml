@@ -1,50 +1,24 @@
 ﻿<Window x:Class="DFOToolbox.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:compModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-        xmlns:model="clr-namespace:DFOToolbox.Models"
         Title="DFO Toolbox" Height="600" Width="1000"
-        Name="ThisWindow">
-    <Window.CommandBindings>
-        <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"></CommandBinding>
-        <CommandBinding Command="Close" Executed="CloseCommandBinding_Executed"></CommandBinding>
-    </Window.CommandBindings>
-    <!-- Uncomment this and the modified CollectionViewSource elements below to see items in the designer -->
-    <Window.Resources>
-        <!--<model:InnerNpkFileList x:Key="InnerFileList">
-            <model:InnerNpkFile Name="foo.img" Path="images/foo.img" />
-            <model:InnerNpkFile Name="bar.img" Path="images/bar.img" />
-            <model:InnerNpkFile Name="baz.img" Path="images/baz.img" />
-        </model:InnerNpkFileList>-->
-        <!--<model:FrameList x:Key="FrameList">
-            <model:FrameMetadata Index="0" Width="85" Height="196" X="200" Y="7" />
-            <model:FrameMetadata Index="1" Width="100" Height="185" X="205" Y="15" LinkFrameIndex="0" />
-        </model:FrameList>-->
-
-        <!--<CollectionViewSource x:Key="InnerFileListView" Source="{StaticResource InnerFileList}">-->
-        <CollectionViewSource x:Key="InnerFileListView" Source="{Binding ElementName=ThisWindow, Path=InnerFileList}">
-            <CollectionViewSource.SortDescriptions>
-                <!-- Don't sort here, it .img's in the NPK's seem to be already sorted, and if not, maybe there is some reason to group similar files together? -->
-                <!--<compModel:SortDescription PropertyName="Name" Direction="Ascending" />
-                <compModel:SortDescription PropertyName="Path" Direction="Ascending" />-->
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
-
-        <!--<CollectionViewSource x:Key="FrameListView" Source="{StaticResource FrameList}" >-->
-        <CollectionViewSource x:Key="FrameListView" Source="{Binding ElementName=ThisWindow, Path=FrameList}">
-
-        </CollectionViewSource>
-    </Window.Resources>
+        Name="ThisWindow"
+        DataContext="{Binding ViewModel, RelativeSource={RelativeSource Self}}">
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommand}" />
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.QuickSaveAsPngCommand}" />
+    </Window.InputBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="27" VerticalAlignment="Top" >
-            <MenuItem Name="mnu_file" Header="File">
-                <MenuItem Name="mnu_open" Header="Open" Command="Open"/>
+            <MenuItem Header="File">
+                <MenuItem Header="Open" InputGestureText="Ctrl+O" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommandCanExecute}" />
+                <MenuItem Header="Save" InputGestureText="Ctrl+S" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.QuickSaveAsPngCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.QuickSaveAsPngCommandCanExecute}" />
                 <Separator />
-                <MenuItem Name="mnu_exit" Header="Exit" Command="Close" />
+                <MenuItem Header="Exit" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.ExitCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.ExitCommandCanExecute}" />
             </MenuItem>
         </Menu>
         <ListBox DockPanel.Dock="Left" Width="200" HorizontalAlignment="Left"
-                 ItemsSource="{Binding Source={StaticResource InnerFileListView}}"
+                 ItemsSource="{Binding InnerFileList}"
                  IsSynchronizedWithCurrentItem="True"
                  DisplayMemberPath="Name"
                  SelectedIndex="-1">
@@ -52,7 +26,7 @@
             <!-- TOOO: Icon?-->
         </ListBox>
         <ListBox DockPanel.Dock="Top"  Height="200" VerticalAlignment="Top"
-                 ItemsSource="{Binding Source={StaticResource FrameListView}}"
+                 ItemsSource="{Binding FrameList}"
                  IsSynchronizedWithCurrentItem="True"
                  SelectedIndex="-1">
             <ListBox.ItemTemplate>
@@ -69,7 +43,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
-            <Image Name="CurrentFrameImage" />
+            <Image Source="{Binding Path=CurrentFrameImage}" />
         </Canvas>
     </DockPanel>
 </Window>

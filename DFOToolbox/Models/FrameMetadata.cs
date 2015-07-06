@@ -9,7 +9,7 @@ using DFO.Common.Images;
 
 namespace DFOToolbox.Models
 {
-    public class FrameMetadata : INotifyPropertyChanged
+    public class FrameMetadata : NotifyPropertyChangedBase
     {
         private int _index;
         public int Index
@@ -83,17 +83,6 @@ namespace DFOToolbox.Models
             _x = frame.LocationX;
             _y = frame.LocationY;
             _linkFrameIndex = linkFrameIndex;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName]string caller = null)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(caller));
-            }
         }
     }
 }

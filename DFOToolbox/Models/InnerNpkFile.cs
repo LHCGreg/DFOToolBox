@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DFOToolbox.Models
 {
-    public class InnerNpkFile : INotifyPropertyChanged
+    public class InnerNpkFile : NotifyPropertyChangedBase
     {
         private string _name;
         public string Name
@@ -33,17 +33,6 @@ namespace DFOToolbox.Models
         {
             _name = name;
             _path = path;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName]string caller = null)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(caller));
-            }
         }
     }
 }

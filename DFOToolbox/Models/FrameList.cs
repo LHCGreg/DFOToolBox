@@ -4,10 +4,21 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 namespace DFOToolbox.Models
 {
-    public class FrameList : ObservableCollection<FrameMetadata>
+    public class FrameList : StrongListCollectionView<FrameMetadata>
     {
+        public FrameList()
+        {
+
+        }
+
+        public FrameList(ObservableCollection<FrameMetadata> frames)
+            : base(frames)
+        {
+
+        }
     }
 }
