@@ -26,6 +26,9 @@
                 <MenuItem Header="Exit" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.ExitCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.ExitCommandCanExecute}" />
             </MenuItem>
         </Menu>
+        <StatusBar DockPanel.Dock="Bottom" MinHeight="22" Background="Silver">
+            <TextBlock Text="{Binding Status}" />
+        </StatusBar>
         <ListBox DockPanel.Dock="Left" Width="200" HorizontalAlignment="Left"
                  ItemsSource="{Binding InnerFileList}"
                  IsSynchronizedWithCurrentItem="True"

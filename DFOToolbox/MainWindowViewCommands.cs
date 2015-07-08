@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Win32;
+using DFO.Utilities;
 
 namespace DFOToolbox
 {
@@ -15,7 +16,7 @@ namespace DFOToolbox
     {
         private MainWindow Window { get; set; }
         private MainWindowViewModel ViewModel { get; set; }
-        
+
         public DelegateCommand QuickSaveAsPngCommand { get; private set; }
 
         private bool _quickSaveAsPngCommandCanExecute;
@@ -56,11 +57,11 @@ namespace DFOToolbox
 
         private void OnOpen()
         {
-            if(!CanOpen())
+            if (!CanOpen())
             {
                 return;
             }
-            
+
             // Get file to open
             // TODO: Detect DFO installation directory and default to that
             OpenFileDialog filePicker = new OpenFileDialog()
@@ -112,7 +113,7 @@ namespace DFOToolbox
             ViewModel = viewModel;
             ViewModel.PropertyChanged += OnViewModelPropertyChanged;
             OpenCommand = new DelegateCommand(OnOpen); // Don't give a delegate for if the command can execute, the menu item IsEnabled seems buggy when that's done...just manually bind IsEnabled
-            QuickSaveAsPngCommand = new DelegateCommand(() => ViewModel.QuickSaveAsPng());
+            QuickSaveAsPngCommand = new DelegateCommand(OnQuickSaveAsPng);
             ExitCommand = new DelegateCommand(OnExit);
 
             RefreshCanOpen();
@@ -129,6 +130,40 @@ namespace DFOToolbox
             else if (e.PropertyName == MainWindowViewModel.PropertyNameCanOpen)
             {
                 RefreshCanOpen();
+            }
+        }
+
+        private void OnQuickSaveAsPng()
+        {
+            if (!CanQuickSaveAsPng())
+            {
+                return;
+            }
+
+            QuickSaveResults results = null;
+            try
+            {
+                results = ViewModel.QuickSaveAsPng(ViewModel.InnerFileList.Current.Path, ViewModel.FrameList.Current.Index);
+            }
+            catch (Exception ex)
+            {
+                // unexpected exception
+                // TODO: Log
+                ViewModel.Status = "Unexpected error: {0}".F(ex.Message);
+            }
+
+            // TODO: Make new statuses fade in to give indication that it's a new status
+
+            if (results.Error == null)
+            {
+                // success
+                ViewModel.Status = "Saved to {0}".F(results.OutputPath);
+            }
+            else
+            {
+                // error
+                // TODO: Log, more details
+                ViewModel.Status = results.Error.Message;
             }
         }
     }

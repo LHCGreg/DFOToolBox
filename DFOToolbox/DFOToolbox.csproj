@@ -71,9 +71,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DesignerMainWindowViewModel.cs" />
+    <Compile Include="DFOToolboxException.cs" />
     <Compile Include="IMainWindowViewModel.cs" />
     <Compile Include="NotifyPropertyChangedBase.cs" />
     <Compile Include="MainWindowViewCommands.cs" />
+    <Compile Include="QuickSaveResults.cs" />
     <Compile Include="StrongListCollectionView.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -133,6 +135,10 @@
     <ProjectReference Include="..\DFO.Npk\DFO.Npk.csproj">
       <Project>{04c832f4-8f9d-457a-99fe-cc33eaa98bfe}</Project>
       <Name>DFO.Npk</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DFO.Utilities\DFO.Utilities.csproj">
+      <Project>{9aba11f3-61ac-4b40-8432-91b3fe9ca351}</Project>
+      <Name>DFO.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

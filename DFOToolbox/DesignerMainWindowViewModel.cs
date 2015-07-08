@@ -15,6 +15,7 @@ namespace DFOToolbox
         public InnerNpkFileList InnerFileList { get; set; }
         public FrameList FrameList { get; set; }
         public ImageSource CurrentFrameImage { get; set; }
+        public string Status { get; set; }
         public bool CanOpen { get; set; }
         public bool CanQuickSaveAsPng { get; set; }
 
@@ -35,6 +36,7 @@ namespace DFOToolbox
             };
 
             CurrentFrameImage = null;
+            Status = "I'm the status";
             CanOpen = true;
             CanQuickSaveAsPng = true;
         }
@@ -44,9 +46,9 @@ namespace DFOToolbox
 
         }
 
-        public void QuickSaveAsPng()
+        public QuickSaveResults QuickSaveAsPng(string imgPath, int frameIndex)
         {
-
+            return new QuickSaveResults() { Error = new DFOToolboxException("Designer viewmodel doesn't support saving.") };
         }
     }
 }

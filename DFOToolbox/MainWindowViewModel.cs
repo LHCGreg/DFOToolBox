@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DFO.Common;
 using DFO.Common.Images;
+using DFO.Images;
 using DFO.Npk;
+using DFO.Utilities;
 using DFOToolbox.Models;
-using Microsoft.Practices.Prism.Commands;
-using Microsoft.Win32;
 
 namespace DFOToolbox
 {
     public class MainWindowViewModel : NotifyPropertyChangedBase, IMainWindowViewModel, IDisposable
     {
         private NpkReader _npk;
+
+        private const string _quicksaveFolderName = "DFOToolbox";
+        private string _quicksaveFolderPath;
 
         private InnerNpkFileList _innerFileList;
         public InnerNpkFileList InnerFileList
@@ -42,6 +40,13 @@ namespace DFOToolbox
         {
             get { return _currentFrameImage; }
             set { _currentFrameImage = value; OnPropertyChanged(); }
+        }
+
+        private string _status;
+        public string Status
+        {
+            get { return _status; }
+            set { _status = value; OnPropertyChanged(); }
         }
 
         // Wiring up command objects' CanExecute() seems complicated and/or inefficient, so just expose a property for that.
@@ -90,6 +95,8 @@ namespace DFOToolbox
         public MainWindowViewModel()
         {
             // TODO: inject dependencies
+            _quicksaveFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), _quicksaveFolderName);
+
             InnerFileList = new InnerNpkFileList();
             InnerFileList.CurrentChanged += SelectedInnerFileChanged;
 
@@ -255,14 +262,61 @@ namespace DFOToolbox
             CurrentFrameImage = BitmapSource.Create(frame.Width, frame.Height, dpiX: 96, dpiY: 96, pixelFormat: PixelFormats.Bgra32, palette: null, pixels: convertedBytes, stride: 4 * frame.Width);
         }
 
-        public void QuickSaveAsPng()
+        /// <summary>
+        /// If there is an expected error, the Error property of the results is set to a DFOToolboxException with a message
+        /// suitable for display.
+        /// </summary>
+        /// <param name="imgPath"></param>
+        /// <param name="frameIndex"></param>
+        /// <returns></returns>
+        public QuickSaveResults QuickSaveAsPng(string imgPath, int frameIndex)
         {
-            if (!GetCanQuickSaveAsPng())
+            if (imgPath == null) throw new ArgumentNullException("imgPath");
+
+            QuickSaveResults results = new QuickSaveResults();
+
+            string filename = "{0}.{1}.png".F(SanitizeImgPathForFilename(imgPath), frameIndex);
+            string path = Path.Combine(_quicksaveFolderPath, filename);
+            results.OutputPath = path;
+
+            // Save to (folder)/(sanitized img path).(frame number).png
+            if (!Directory.Exists(_quicksaveFolderPath))
             {
-                return;
+                try
+                {
+                    Directory.CreateDirectory(_quicksaveFolderPath);
+                }
+                catch (Exception ex)
+                {
+                    results.Error = new DFOToolboxException("Could not create quicksave directory {0}".F(_quicksaveFolderPath), ex);
+                    return results;
+                }
             }
-            // TODO
-            MessageBox.Show("Save as PNG");
+
+            try
+            {
+                using (FileStream pngOutput = File.Open(path, FileMode.Create))
+                {
+                    Export.ToPng(_npk, imgPath, frameIndex, pngOutput);
+                }
+            }
+            catch (Exception ex)
+            {
+                results.Error = new DFOToolboxException("Error saving to {0}".F(path), ex);
+                return results;
+            }
+
+            return results;
+        }
+
+        private string SanitizeImgPathForFilename(string imgPath)
+        {
+            imgPath = imgPath.Replace('/', '.').Replace('\\', '.');
+            foreach (char invalidChar in Path.GetInvalidFileNameChars())
+            {
+                imgPath = imgPath.Replace(invalidChar.ToString(), "");
+            }
+            return imgPath;
         }
 
         public void Dispose()

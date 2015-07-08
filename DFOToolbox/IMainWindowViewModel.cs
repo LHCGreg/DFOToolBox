@@ -14,11 +14,12 @@ namespace DFOToolbox
         InnerNpkFileList InnerFileList { get; set; }
         FrameList FrameList { get; set; }
         ImageSource CurrentFrameImage { get; set; }
+        string Status { get; set; }
 
         void Open(string npkPath);
         bool CanOpen { get; set; }
 
-        void QuickSaveAsPng();
+        QuickSaveResults QuickSaveAsPng(string imgPath, int frameIndex);
         bool CanQuickSaveAsPng { get; set; }
     }
 }
