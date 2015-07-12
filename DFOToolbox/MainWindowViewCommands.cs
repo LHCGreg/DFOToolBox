@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Win32;
 using DFO.Utilities;
+using DFOToolbox.Models;
 
 namespace DFOToolbox
 {
@@ -140,30 +141,53 @@ namespace DFOToolbox
                 return;
             }
 
-            QuickSaveResults results = null;
+            List<QuickSaveResults> results = new List<QuickSaveResults>();
+            List<FrameMetadata> selectedFrames = ViewModel.FrameList.AllCurrent.ToList();
             try
             {
-                results = ViewModel.QuickSaveAsPng(ViewModel.InnerFileList.Current.Path, ViewModel.FrameList.Current.Index);
+                foreach (FrameMetadata frame in selectedFrames)
+                {
+                    results.Add(ViewModel.QuickSaveAsPng(ViewModel.InnerFileList.Current.Path, frame.Index));
+                }
             }
             catch (Exception ex)
             {
                 // unexpected exception
                 // TODO: Log
                 ViewModel.Status = "Unexpected error: {0}".F(ex.Message);
+                return;
             }
 
             // TODO: Make new statuses fade in to give indication that it's a new status
 
-            if (results.Error == null)
-            {
-                // success
-                ViewModel.Status = "Saved to {0}".F(results.OutputPath);
-            }
-            else
+            if (results.Any(r => r.Error != null))
             {
                 // error
                 // TODO: Log, more details
-                ViewModel.Status = results.Error.Message;
+                if(results.Count == 1)
+                {
+                    ViewModel.Status = results[0].Error.Message;
+                }
+                else if(results.Count(r => r.Error != null) == 1)
+                {
+                    ViewModel.Status = results.First(r => r.Error != null).Error.Message;
+                }
+                else
+                {
+                    ViewModel.Status = "There were errors saving some frames.";
+                }
+            }
+            else
+            {
+                // success
+                if (results.Count == 1)
+                {
+                    ViewModel.Status = "Saved to {0}".F(results[0].OutputPath);
+                }
+                else
+                {
+                    ViewModel.Status = "Saved {0} images to {1}".F(results.Count, results[0].OutputFolder);
+                }
             }
         }
     }

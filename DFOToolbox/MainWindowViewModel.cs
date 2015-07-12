@@ -84,7 +84,7 @@ namespace DFOToolbox
 
         private bool GetCanQuickSaveAsPng()
         {
-            return FrameList.Current != null;
+            return FrameList.AllCurrent.Any();
         }
 
         private void RefreshCanQuickSaveAsPng()
@@ -277,6 +277,7 @@ namespace DFOToolbox
 
             string filename = "{0}.{1}.png".F(SanitizeImgPathForFilename(imgPath), frameIndex);
             string path = Path.Combine(_quicksaveFolderPath, filename);
+            results.OutputFolder = _quicksaveFolderPath;
             results.OutputPath = path;
 
             // Save to (folder)/(sanitized img path).(frame number).png

@@ -9,7 +9,7 @@ using DFO.Common.Images;
 
 namespace DFOToolbox.Models
 {
-    public class FrameMetadata : NotifyPropertyChangedBase
+    public class FrameMetadata : NotifyPropertyChangedBase, ISelectable
     {
         private int _index;
         public int Index
@@ -17,6 +17,15 @@ namespace DFOToolbox.Models
             get { return _index; }
             set { _index = value; OnPropertyChanged(); }
         }
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set { _isSelected = value; OnPropertyChanged(); }
+        }
+
+        public const string PropertyNameIsSelected = "IsSelected";
         
         private int _width;
         public int Width

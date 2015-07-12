@@ -8,7 +8,7 @@ using System.Windows.Data;
 
 namespace DFOToolbox.Models
 {
-    public class FrameList : StrongListCollectionView<FrameMetadata>
+    public class FrameList : StrongMultiSelectListCollectionView<FrameMetadata>
     {
         public FrameList()
         {

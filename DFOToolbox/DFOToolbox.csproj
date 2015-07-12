@@ -73,10 +73,12 @@
     <Compile Include="DesignerMainWindowViewModel.cs" />
     <Compile Include="DFOToolboxException.cs" />
     <Compile Include="IMainWindowViewModel.cs" />
+    <Compile Include="ISelectable.cs" />
     <Compile Include="NotifyPropertyChangedBase.cs" />
     <Compile Include="MainWindowViewCommands.cs" />
     <Compile Include="QuickSaveResults.cs" />
     <Compile Include="StrongListCollectionView.cs" />
+    <Compile Include="StrongMultiSelectListCollectionView.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -31,8 +31,9 @@
         </StatusBar>
         <ListBox DockPanel.Dock="Left" Width="200" HorizontalAlignment="Left"
                  ItemsSource="{Binding InnerFileList}"
-                 IsSynchronizedWithCurrentItem="True"
                  DisplayMemberPath="Name"
+                 IsSynchronizedWithCurrentItem="True"
+                 VirtualizingPanel.IsVirtualizing="False"
                  SelectedIndex="-1">
             <!-- TODO: Sizing -->
             <!-- TOOO: Icon?-->
@@ -40,19 +41,23 @@
         <ListBox DockPanel.Dock="Top"  Height="200" VerticalAlignment="Top"
                  ItemsSource="{Binding FrameList}"
                  IsSynchronizedWithCurrentItem="True"
+                 VirtualizingPanel.IsVirtualizing="False"
+                 SelectionMode="Extended"
                  SelectedIndex="-1">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <!-- TODO: Margin between checkbox and text -->
-                        <!-- TODO: Make spacebar toggle checkbox -->
-                        <CheckBox VerticalAlignment="Center" />
                         <TextBlock>
                             <TextBlock Text="{Binding Path=Index}" /> <TextBlock Text="{Binding Path=Width}" />x<TextBlock Text="{Binding Path=Height}" /> (<TextBlock Text="{Binding Path=X}" />, <TextBlock Text="{Binding Path=Y}" />)
                         </TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
         </ListBox>
         <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
             <Image Source="{Binding Path=CurrentFrameImage}" />
