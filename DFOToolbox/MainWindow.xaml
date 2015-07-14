@@ -14,8 +14,10 @@
     </Window.InputBindings>
     <Window.Resources>
         <vm:DesignerMainWindowViewModel x:Key="DesignViewModel">
-            
         </vm:DesignerMainWindowViewModel>
+        <ContextMenu x:Key="FrameListContextMenu">
+            <MenuItem Header="Save As PNG" Command="{Binding Source={x:Reference ThisWindow}, Path=ViewCommands.QuickSaveAsPngCommand}" />
+        </ContextMenu>
     </Window.Resources>
     <DockPanel designer:DataContext="{Binding Source={StaticResource DesignViewModel}}">
         <Menu DockPanel.Dock="Top" Height="27" VerticalAlignment="Top" >
@@ -29,6 +31,7 @@
         <StatusBar DockPanel.Dock="Bottom" MinHeight="22" Background="Silver">
             <TextBlock Text="{Binding Status}" />
         </StatusBar>
+        <!-- Inner file (.img) listbox -->
         <ListBox DockPanel.Dock="Left" Width="200" HorizontalAlignment="Left"
                  ItemsSource="{Binding InnerFileList}"
                  DisplayMemberPath="Name"
@@ -38,12 +41,14 @@
             <!-- TODO: Sizing -->
             <!-- TOOO: Icon?-->
         </ListBox>
+        <!-- Frame listbox -->
         <ListBox DockPanel.Dock="Top"  Height="200" VerticalAlignment="Top"
                  ItemsSource="{Binding FrameList}"
                  IsSynchronizedWithCurrentItem="True"
                  VirtualizingPanel.IsVirtualizing="False"
                  SelectionMode="Extended"
-                 SelectedIndex="-1">
+                 SelectedIndex="-1"
+                 ContextMenu="{StaticResource FrameListContextMenu}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -59,6 +64,7 @@
                 </Style>
             </ListBox.ItemContainerStyle>
         </ListBox>
+        <!-- Image display area -->
         <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
             <Image Source="{Binding Path=CurrentFrameImage}" />
         </Canvas>
