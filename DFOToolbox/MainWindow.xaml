@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="designer"
         xmlns:vm="clr-namespace:DFOToolbox"
+        xmlns:local="clr-namespace:DFOToolbox"
         Title="DFO Toolbox" Height="600" Width="1000"
         Name="ThisWindow"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Self}}">
@@ -42,8 +43,10 @@
             <!-- TOOO: Icon?-->
         </ListBox>
         <!-- Frame listbox -->
+        <!-- local:MultiSelect.IsEnabled="True" is custom binding for multiselect listboxes because WPF doesn't have it built in -_- -->
         <ListBox DockPanel.Dock="Top"  Height="200" VerticalAlignment="Top"
                  ItemsSource="{Binding FrameList}"
+                 local:MultiSelect.IsEnabled="True"
                  IsSynchronizedWithCurrentItem="True"
                  VirtualizingPanel.IsVirtualizing="False"
                  SelectionMode="Extended"
@@ -58,11 +61,6 @@
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
-                    <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
-                </Style>
-            </ListBox.ItemContainerStyle>
         </ListBox>
         <!-- Image display area -->
         <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">

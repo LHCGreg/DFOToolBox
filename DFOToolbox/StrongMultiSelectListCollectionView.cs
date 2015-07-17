@@ -8,7 +8,7 @@ using System.Windows.Data;
 
 namespace DFOToolbox
 {
-    public class StrongMultiSelectListCollectionView<T> : ListCollectionView
+    public class StrongMultiSelectListCollectionView<T> : MultiSelectCollectionView<T>
         where T : ISelectable
     {
         public StrongMultiSelectListCollectionView()
@@ -25,6 +25,7 @@ namespace DFOToolbox
 
         public void Clear()
         {
+            SelectedItems.Clear();
             InternalList.Clear();
         }
 
@@ -32,8 +33,6 @@ namespace DFOToolbox
         {
             InternalList.Add(item);
         }
-
-        public IEnumerable<T> AllCurrent { get { return InternalList.Cast<T>().Where(item => item.IsSelected); } }
 
         public T Current { get { return (T)CurrentItem; } }
     }

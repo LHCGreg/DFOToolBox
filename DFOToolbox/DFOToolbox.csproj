@@ -73,7 +73,10 @@
     <Compile Include="DesignerMainWindowViewModel.cs" />
     <Compile Include="DFOToolboxException.cs" />
     <Compile Include="IMainWindowViewModel.cs" />
+    <Compile Include="IMultiSelectCollectionView.cs" />
     <Compile Include="ISelectable.cs" />
+    <Compile Include="MultiSelect.cs" />
+    <Compile Include="MultiSelectCollectionView.cs" />
     <Compile Include="NotifyPropertyChangedBase.cs" />
     <Compile Include="MainWindowViewCommands.cs" />
     <Compile Include="QuickSaveResults.cs" />

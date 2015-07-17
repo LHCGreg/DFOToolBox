@@ -71,8 +71,6 @@ namespace DFOToolbox
             CanOpen = GetCanOpen();
         }
 
-        //public DelegateCommand QuickSaveAsPngCommand { get; private set; }
-
         private bool _canQuickSaveAsPng;
         public bool CanQuickSaveAsPng
         {
@@ -84,7 +82,7 @@ namespace DFOToolbox
 
         private bool GetCanQuickSaveAsPng()
         {
-            return FrameList.AllCurrent.Any();
+            return FrameList.SelectedItems.Count > 0;
         }
 
         private void RefreshCanQuickSaveAsPng()
@@ -101,8 +99,9 @@ namespace DFOToolbox
             InnerFileList.CurrentChanged += SelectedInnerFileChanged;
 
             FrameList = new FrameList();
+            // Note that SelectedItems may not be up to date yet in the CurrentChanged event handler
             FrameList.CurrentChanged += SelectedFrameChanged;
-            FrameList.CurrentChanged += (sender, e) => RefreshCanQuickSaveAsPng();
+            FrameList.SelectedItems.CollectionChanged += (sender, e) => RefreshCanQuickSaveAsPng();
 
             CanOpen = GetCanOpen();
             CanQuickSaveAsPng = GetCanQuickSaveAsPng();

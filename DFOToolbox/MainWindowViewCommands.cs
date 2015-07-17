@@ -142,7 +142,7 @@ namespace DFOToolbox
             }
 
             List<QuickSaveResults> results = new List<QuickSaveResults>();
-            List<FrameMetadata> selectedFrames = ViewModel.FrameList.AllCurrent.ToList();
+            ICollection<FrameMetadata> selectedFrames = ViewModel.FrameList.SelectedItems;
             try
             {
                 foreach (FrameMetadata frame in selectedFrames)
