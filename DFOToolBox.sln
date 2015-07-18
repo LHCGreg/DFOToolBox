@@ -11,11 +11,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Common", "DFO.Common\DF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Utilities", "DFO.Utilities\DFO.Utilities.csproj", "{9ABA11F3-61AC-4B40-8432-91B3FE9CA351}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Gif", "DFO.Gif\DFO.Gif.csproj", "{44912ED2-024B-4EBF-B02F-910142C81E75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Images", "DFO.Images\DFO.Images.csproj", "{44912ED2-024B-4EBF-B02F-910142C81E75}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "npk2gif", "npk2gif\npk2gif.csproj", "{D4F67769-4AE4-46CA-8442-D463DE903C21}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Common.Tests", "DFO.Common.Tests\DFO.Common.Tests.csproj", "{016B332A-BEF3-496F-A896-3C5F2BC41238}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFOToolbox", "DFOToolbox\DFOToolbox.csproj", "{F745AB63-3DCF-48E3-AD87-93FE67012F72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Npk.IntegrationTests", "DFO.Npk.IntegrationTests\DFO.Npk.IntegrationTests.csproj", "{24DD7BAA-7B3A-420E-9D99-B0ADD7F41C5E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +55,14 @@ Global
 		{016B332A-BEF3-496F-A896-3C5F2BC41238}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{016B332A-BEF3-496F-A896-3C5F2BC41238}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{016B332A-BEF3-496F-A896-3C5F2BC41238}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F745AB63-3DCF-48E3-AD87-93FE67012F72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F745AB63-3DCF-48E3-AD87-93FE67012F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F745AB63-3DCF-48E3-AD87-93FE67012F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F745AB63-3DCF-48E3-AD87-93FE67012F72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24DD7BAA-7B3A-420E-9D99-B0ADD7F41C5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24DD7BAA-7B3A-420E-9D99-B0ADD7F41C5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24DD7BAA-7B3A-420E-9D99-B0ADD7F41C5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24DD7BAA-7B3A-420E-9D99-B0ADD7F41C5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

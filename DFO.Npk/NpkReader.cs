@@ -21,8 +21,16 @@ namespace DFO.Npk
         private static string s_keyString = "puchikon@neople dungeon and fighter DNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNF\0";
         private static byte[] s_key = Encoding.ASCII.GetBytes(s_keyString);
 
+        private static IDictionary<PixelDataFormat, int> s_formatToBytesPerPixel = new Dictionary<PixelDataFormat, int>()
+        {
+            { PixelDataFormat.EightEightEightEight, 4 },
+            { PixelDataFormat.FourFourFourFour, 2 },
+            { PixelDataFormat.OneFiveFiveFive, 2 },
+            { PixelDataFormat.Link, 0 }
+        };
+
         private Dictionary<NpkPath, NpkByteRange> m_imageFileLocations = new Dictionary<NpkPath, NpkByteRange>();
-        private Dictionary<NpkPath, bool> m_imagesInFile = new Dictionary<NpkPath,bool>();
+        private Dictionary<NpkPath, bool> m_imagesInFile = new Dictionary<NpkPath, bool>();
         public IReadOnlyDictionary<NpkPath, bool> Images { get { return m_imagesInFile; } }
 
         private Dictionary<NpkPath, NpkByteRange> m_soundFileLocations = new Dictionary<NpkPath, NpkByteRange>();
@@ -37,7 +45,7 @@ namespace DFO.Npk
         /// Dictionary of NpkPath to frame metadata. Frame metadata is automatically loaded for requested paths if they
         /// have not been loaded yet.
         /// </summary>
-        public IReadOnlyDictionary<NpkPath, IReadOnlyCollection<FrameInfo>> Frames { get; private set; }
+        public IReadOnlyDictionary<NpkPath, IReadOnlyList<FrameInfo>> Frames { get; private set; }
 
         private IDictionary<NpkPath, SoundInfo> m_sounds = new Dictionary<NpkPath, SoundInfo>();
         // Initialized in constructor
@@ -45,6 +53,38 @@ namespace DFO.Npk
         /// Not currently populated.
         /// </summary>
         public IReadOnlyDictionary<NpkPath, SoundInfo> Sounds { get; private set; }
+
+        /// <summary>
+        /// Set to true to do extra error checks that are not normally done because they have a performance hit.
+        /// Errors are notified by firing the ErrorDetected event instead of throwing an exception so all errors can be listed.
+        /// For use by automated tests
+        /// </summary>
+        internal bool DoExtraErrorChecks { get; set; }
+
+        /// <summary>
+        /// Used to notify of an error found when doing additional error checking for automated tests that are skipped
+        /// during normal use.
+        /// </summary>
+        internal event Action<object, ErrorDetectedEventArgs> ErrorDetected;
+
+        internal class ErrorDetectedEventArgs
+        {
+            public string Message { get; private set; }
+
+            public ErrorDetectedEventArgs(string message)
+            {
+                Message = message;
+            }
+        }
+
+        private void OnErrorDetected(string message)
+        {
+            ErrorDetectedEventArgs args = new ErrorDetectedEventArgs(message);
+            if (ErrorDetected != null)
+            {
+                ErrorDetected(this, args);
+            }
+        }
 
         /// <summary>
         /// Opens the NPK file and reads the metadata for each packed file. Metadata for the frames in the
@@ -59,7 +99,18 @@ namespace DFO.Npk
         /// <exception cref="System.UnauthorizedAccessException">The caller does not have the required
         /// permission or the file is actually a directory.</exception>
         public NpkReader(string pathOfNpkFile)
+            : this(pathOfNpkFile, extraErrorHandler: null)
         {
+
+        }
+
+        internal NpkReader(string pathOfNpkFile, Action<object, ErrorDetectedEventArgs> extraErrorHandler)
+        {
+            if (extraErrorHandler != null)
+            {
+                DoExtraErrorChecks = true;
+                ErrorDetected += extraErrorHandler;
+            }
             pathOfNpkFile.ThrowIfNull("pathOfNpkFile");
             m_npkStream = OpenNpkFile(pathOfNpkFile);
             m_disposeStream = true;
@@ -77,9 +128,9 @@ namespace DFO.Npk
         /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
         /// <exception cref="Dfo.Npk.NpkException">The .npk file is corrupt or the format changed.</exception>
         public NpkReader(Stream npkStream)
-            : this(npkStream, disposeStream: true)
+            : this(npkStream, disposeStream: true, extraErrorHandler: null)
         {
-            
+
         }
 
         /// <summary>
@@ -94,7 +145,19 @@ namespace DFO.Npk
         /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
         /// <exception cref="Dfo.Npk.NpkException">The .npk file is corrupt or the format changed.</exception>
         public NpkReader(Stream npkStream, bool disposeStream)
+            : this(npkStream, disposeStream, extraErrorHandler: null)
         {
+
+        }
+
+        internal NpkReader(Stream npkStream, bool disposeStream, Action<object, ErrorDetectedEventArgs> extraErrorHandler)
+        {
+            if (extraErrorHandler != null)
+            {
+                DoExtraErrorChecks = true;
+                ErrorDetected += extraErrorHandler;
+            }
+
             npkStream.ThrowIfNull("npkStream");
             m_npkStream = npkStream;
             m_disposeStream = disposeStream;
@@ -219,13 +282,15 @@ namespace DFO.Npk
                         }
                         else
                         {
-                            ; // Not an image or a sound. Ignore it I guess, no sense throwing an exception.
+                            // Not an image or a sound. Ignore it I guess, no sense throwing an exception.
                             // Don't break any programs just because a new file type was added or something.
+                            OnErrorDetected("Something other than a sprite or sounds file at packed file index {0}: {1}".F(fileIndex, pathComponents[0]));
                         }
                     }
                     else
                     {
-                        ; // empty path? O_o Ignore it I guess.
+                        // empty path? O_o Ignore it I guess.
+                        OnErrorDetected("Empty path at packed file index {0}.".F(fileIndex));
                     }
                 }
             }
@@ -274,6 +339,7 @@ namespace DFO.Npk
         /// Loads a sprite file's metadata, setting its value in m_images and
         /// m_frameLocations. The .npk file is assumed to be open.
         /// </summary>
+        /// <param name="lookForErrors">Do some extra checks to look for errors in the NPK reading code. For use by automated tests.</param>
         /// <exception cref="System.IO.IOException">I/O error.</exception>
         /// <exception cref="Dfo.Npk.NpkException">The .npk file appears to be corrupt or the format has changed.</exception>
         private void LoadSpriteFileMetaData(NpkPath spriteFilePath, NpkByteRange spriteFileLocation)
@@ -296,7 +362,7 @@ namespace DFO.Npk
                 string headerString = Encoding.ASCII.GetString(headerBuffer);
                 if (!string.Equals(imageFileHeader, headerString, StringComparison.Ordinal))
                 {
-                    throw new NpkException("Did not find expected image file header.");
+                    throw new NpkException("Did not find expected image file header when reading {0}.".F(spriteFilePath));
                 }
 
                 // Don't know what these 4 bytes, 4 bytes, and 4 bytes are
@@ -318,13 +384,14 @@ namespace DFO.Npk
                 }
 
                 // Next is each non-reference frame's pixel data, one after the other.
+                long currentFramePosition = m_npkStream.Position;
                 for (uint frameIndex = 0; frameIndex < numFrames; frameIndex++)
                 {
                     FrameInfo frame = frames[(int)frameIndex];
                     if (frame.LinkFrame != null)
                     {
                         // Link frames have no pixel data
-                        // Could set this to referenced frame's data to simply code elsewhere?
+                        // Could set this to referenced frame's data to simplify code elsewhere?
                         frameLocations.Add(new NpkByteRange(0, 0));
                         continue;
                     }
@@ -332,15 +399,67 @@ namespace DFO.Npk
                     NpkByteRange frameByteRange;
                     if (frame.IsCompressed)
                     {
-                        frameByteRange = new NpkByteRange(m_npkStream.Position, frame.CompressedLength);
+                        frameByteRange = new NpkByteRange(currentFramePosition, frame.CompressedLength);
                     }
                     else
                     {
-                        frameByteRange = new NpkByteRange(m_npkStream.Position, frame.CompressedLength / 2);
+                        int length = frame.Width * frame.Height * s_formatToBytesPerPixel[frame.PixelFormat];
+                        frameByteRange = new NpkByteRange(currentFramePosition, length);
                     }
 
                     frameLocations.Add(frameByteRange);
-                    Seek(frameByteRange.Size, SeekOrigin.Current);
+
+                    currentFramePosition += frameByteRange.Size;
+
+                    // No need to seek through the pixel data normally.
+                    // Do it when doing extra error checks to verify that after the pixel data of all the frames
+                    // is either another img file or EOF.
+                    if (DoExtraErrorChecks)
+                    {
+                        Seek(frameByteRange.Size, SeekOrigin.Current);
+                    }
+                }
+
+                if (DoExtraErrorChecks)
+                {
+                    // Check for invalid link frames
+                    for (uint frameIndex = 0; frameIndex < numFrames; frameIndex++)
+                    {
+                        FrameInfo frame = frames[(int)frameIndex];
+                        if (frame.LinkFrame != null && (frame.LinkFrame.Value >= numFrames || frame.LinkFrame.Value < 0))
+                        {
+                            OnErrorDetected("{0}, invalid link frame index from {1} to {2}.".F(spriteFilePath, frameIndex, frame.LinkFrame.Value));
+                        }
+
+                        if (frame.LinkFrame != null)
+                        {
+                            FrameInfo linkedFrame = frames[frame.LinkFrame.Value];
+                            if (linkedFrame.LinkFrame != null)
+                            {
+                                OnErrorDetected("{0}, link frame to a link frame, {1} to {2}.".F(spriteFilePath, frameIndex, frame.LinkFrame.Value));
+                            }
+                        }
+                    }
+                    
+                    // Should be "Neople Img File" or EOF
+                    byte[] nextImgHeaderBuf = new byte[15];
+                    int bytesRead = m_npkStream.Read(nextImgHeaderBuf, 0, 15);
+                    if (bytesRead == 0)
+                    {
+                        // EOF, we're ok
+                    }
+                    else if (bytesRead != 15)
+                    {
+                        OnErrorDetected(string.Format("{0}, {1} bytes read instead of 15 or 0.", spriteFilePath.Path, bytesRead));
+                    }
+                    else
+                    {
+                        string nextImgHeader = Encoding.ASCII.GetString(nextImgHeaderBuf);
+                        if (nextImgHeader != "Neople Img File")
+                        {
+                            OnErrorDetected(string.Format("{0}, header is not Neople Img File.", spriteFilePath.Path));
+                        }
+                    }
                 }
 
                 m_frames[spriteFilePath] = frames;
@@ -362,6 +481,16 @@ namespace DFO.Npk
         private FrameInfo ReadFrameMetadata()
         {
             uint mode = GetUnsigned32Le();
+
+            if (DoExtraErrorChecks)
+            {
+                if ((int)mode != (int)PixelDataFormat.Link && (int)mode != (int)PixelDataFormat.OneFiveFiveFive
+                    && (int)mode != (int)PixelDataFormat.FourFourFourFour && (int)mode != (int)PixelDataFormat.EightEightEightEight)
+                {
+                    OnErrorDetected("Frame with unknown pixel format {0}.".F(mode));
+                }
+            }
+
             if ((int)mode == (int)PixelDataFormat.Link)
             {
                 // reference
@@ -463,9 +592,8 @@ namespace DFO.Npk
                 int realFrameIndex = frameIndex;
 
                 // Follow frame links
-                while (frameData.LinkFrame != null)
+                if (frameData.LinkFrame != null)
                 {
-                    // TODO: Detect infinite links - or maybe only allow one link to be followed.
                     realFrameIndex = frameData.LinkFrame.Value;
                     if (realFrameIndex >= imgFrames.Count || realFrameIndex < 0)
                     {
@@ -473,6 +601,13 @@ namespace DFO.Npk
                             .F(realFrameIndex, imgPath, imgFrames.Count));
                     }
                     frameData = imgFrames[realFrameIndex];
+
+                    if (frameData.LinkFrame != null)
+                    {
+                        throw new NpkException(
+                            "There is a link frame to another link frame which is not allowed. {0} frame {1} links to frame {2}."
+                            .F(imgPath, frameIndex, realFrameIndex));
+                    }
                 }
 
                 NpkByteRange pixelDataLocation = m_frameLocations[imgPath][realFrameIndex];

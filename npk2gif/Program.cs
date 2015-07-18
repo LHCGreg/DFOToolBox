@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DFO.Common;
 using DFO.Common.Images;
-using DFO.Gif;
+using DFO.Images;
 using DFO.Npk;
 using NDesk.Options;
 

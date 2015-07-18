@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text;
+using System.Globalization;
 
 namespace DFO.Utilities
 {
@@ -264,9 +265,28 @@ namespace DFO.Utilities
             }
         }
 
+        /// <summary>
+        /// Helper for doing string.Format with CultureInfo.InvariantCulture, so you can write "foo {0} bar".F(baz) instead of
+        /// string.Format(CultureInfo.InvariantCulture, "foo {0} bar", baz)
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string F(this string str, params object[] args)
         {
-            return string.Format(str, args);
+            return string.Format(CultureInfo.InvariantCulture, str, args);
+        }
+
+        /// <summary>
+        /// Helper for doing string.Format with CultureInfo.CurrentCulture, so you can write "foo {0} bar".CF(baz) instead of
+        /// string.Format(CultureInfo.CurrentCulture, "foo {0} bar", baz)
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static string CF(this string str, params object[] args)
+        {
+            return string.Format(CultureInfo.CurrentCulture, str, args);
         }
     }
 }

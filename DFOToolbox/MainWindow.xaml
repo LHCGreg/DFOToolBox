@@ -1,0 +1,70 @@
+﻿<Window x:Class="DFOToolbox.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:designer="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="designer"
+        xmlns:vm="clr-namespace:DFOToolbox"
+        xmlns:local="clr-namespace:DFOToolbox"
+        Title="DFO Toolbox" Height="600" Width="1000"
+        Name="ThisWindow"
+        DataContext="{Binding ViewModel, RelativeSource={RelativeSource Self}}">
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommand}" />
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.QuickSaveAsPngCommand}" />
+    </Window.InputBindings>
+    <Window.Resources>
+        <vm:DesignerMainWindowViewModel x:Key="DesignViewModel">
+        </vm:DesignerMainWindowViewModel>
+        <ContextMenu x:Key="FrameListContextMenu">
+            <MenuItem Header="Save As PNG" Command="{Binding Source={x:Reference ThisWindow}, Path=ViewCommands.QuickSaveAsPngCommand}" />
+        </ContextMenu>
+    </Window.Resources>
+    <DockPanel designer:DataContext="{Binding Source={StaticResource DesignViewModel}}">
+        <Menu DockPanel.Dock="Top" Height="27" VerticalAlignment="Top" >
+            <MenuItem Header="File">
+                <MenuItem Header="Open" InputGestureText="Ctrl+O" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommandCanExecute}" />
+                <MenuItem Header="Save" InputGestureText="Ctrl+S" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.QuickSaveAsPngCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.QuickSaveAsPngCommandCanExecute}" />
+                <Separator />
+                <MenuItem Header="Exit" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.ExitCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.ExitCommandCanExecute}" />
+            </MenuItem>
+        </Menu>
+        <StatusBar DockPanel.Dock="Bottom" MinHeight="22" Background="Silver">
+            <TextBlock Text="{Binding Status}" />
+        </StatusBar>
+        <!-- Inner file (.img) listbox -->
+        <ListBox DockPanel.Dock="Left" Width="200" HorizontalAlignment="Left"
+                 ItemsSource="{Binding InnerFileList}"
+                 DisplayMemberPath="Name"
+                 IsSynchronizedWithCurrentItem="True"
+                 VirtualizingPanel.IsVirtualizing="False"
+                 SelectedIndex="-1">
+            <!-- TODO: Sizing -->
+            <!-- TOOO: Icon?-->
+        </ListBox>
+        <!-- Frame listbox -->
+        <!-- local:MultiSelect.IsEnabled="True" is custom binding for multiselect listboxes because WPF doesn't have it built in -_- -->
+        <ListBox DockPanel.Dock="Top"  Height="200" VerticalAlignment="Top"
+                 ItemsSource="{Binding FrameList}"
+                 local:MultiSelect.IsEnabled="True"
+                 IsSynchronizedWithCurrentItem="True"
+                 VirtualizingPanel.IsVirtualizing="False"
+                 SelectionMode="Extended"
+                 SelectedIndex="-1"
+                 ContextMenu="{StaticResource FrameListContextMenu}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>
+                            <TextBlock Text="{Binding Path=Index}" /> <TextBlock Text="{Binding Path=Width}" />x<TextBlock Text="{Binding Path=Height}" /> (<TextBlock Text="{Binding Path=X}" />, <TextBlock Text="{Binding Path=Y}" />)
+                        </TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <!-- Image display area -->
+        <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+            <Image Source="{Binding Path=CurrentFrameImage}" />
+        </Canvas>
+    </DockPanel>
+</Window>

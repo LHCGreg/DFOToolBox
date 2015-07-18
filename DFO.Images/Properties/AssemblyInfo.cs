@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DFO.Utilities")]
-[assembly: AssemblyDescription("Non-DFO related utility library")]
+[assembly: AssemblyTitle("DFO.Images")]
+[assembly: AssemblyDescription("Library for exporting DFO images as various formats")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DFO Toolbox")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f6b093e2-29ec-46ff-acfc-cb782d76d076")]
+[assembly: Guid("1951d080-8ef9-4794-9046-b3c53569209a")]
 
 // Version information for an assembly consists of the following four values:
 //

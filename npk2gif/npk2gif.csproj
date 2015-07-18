@@ -55,9 +55,9 @@
       <Project>{f96de472-94ce-46dc-89fe-049207cc9541}</Project>
       <Name>DFO.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DFO.Gif\DFO.Gif.csproj">
+    <ProjectReference Include="..\DFO.Images\DFO.Images.csproj">
       <Project>{44912ed2-024b-4ebf-b02f-910142c81e75}</Project>
-      <Name>DFO.Gif</Name>
+      <Name>DFO.Images</Name>
     </ProjectReference>
     <ProjectReference Include="..\DFO.Npk\DFO.Npk.csproj">
       <Project>{04c832f4-8f9d-457a-99fe-cc33eaa98bfe}</Project>
@@ -85,11 +85,12 @@
       <Link>ndesk_options_license.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\licenses\sharpziplib_license.txt">
-      <Link>sharpziplib_license.txt</Link>
+    <Content Include="..\licenses\readme.txt">
+      <Link>readme.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="readme.txt">
+    <Content Include="..\licenses\sharpziplib_license.txt">
+      <Link>sharpziplib_license.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

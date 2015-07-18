@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{44912ED2-024B-4EBF-B02F-910142C81E75}</ProjectGuid>
+    <ProjectGuid>{24DD7BAA-7B3A-420E-9D99-B0ADD7F41C5E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DFO.Gif</RootNamespace>
-    <AssemblyName>DFO.Gif</AssemblyName>
+    <RootNamespace>DFO.Npk.IntegrationTests</RootNamespace>
+    <AssemblyName>DFO.Npk.IntegrationTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>ae126a1f</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,21 +30,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GraphicsMagick.NET-AnyCPU, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ee2094eb40f5ea47, processorArchitecture=MSIL">
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\GraphicsMagick.NET-Q8-AnyCPU.1.3.21.1\lib\net40-client\GraphicsMagick.NET-AnyCPU.dll</HintPath>
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GifMaker.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="NpkReaderTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -53,9 +49,17 @@
       <Project>{f96de472-94ce-46dc-89fe-049207cc9541}</Project>
       <Name>DFO.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DFO.Npk\DFO.Npk.csproj">
+      <Project>{04c832f4-8f9d-457a-99fe-cc33eaa98bfe}</Project>
+      <Name>DFO.Npk</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="setup.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

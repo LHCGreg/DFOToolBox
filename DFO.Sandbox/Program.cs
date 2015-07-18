@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using DFO.Common;
 using DFO.Common.Images;
-using DFO.Gif;
+using DFO.Images;
 using DFO.Npk;
 
 namespace DFO.Sandbox
