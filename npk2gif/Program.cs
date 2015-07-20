@@ -8,6 +8,7 @@ using DFO.Common;
 using DFO.Common.Images;
 using DFO.Images;
 using DFO.Npk;
+using DFO.Utilities;
 using NDesk.Options;
 
 namespace DFO.npk2gif
@@ -41,7 +42,7 @@ namespace DFO.npk2gif
                         }
                         catch (Exception ex)
                         {
-                            Console.Error.WriteLine("Error creating GIF: {0}", ex.Message);
+                            Console.Error.WriteLine("Error creating GIF: {0}", Utils.GetExceptionMessageWithInnerExceptions(ex));
                             Console.Error.WriteLine(ex.StackTrace);
                             giffer.Dispose();
                             gifOutputStream.Dispose();
@@ -60,7 +61,7 @@ namespace DFO.npk2gif
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Unexpected error: {0}", ex.Message);
+                Console.Error.WriteLine("Unexpected error: {0}", Utils.GetExceptionMessageWithInnerExceptions(ex));
                 Console.Error.WriteLine(ex.StackTrace);
             }
         }
@@ -84,7 +85,7 @@ namespace DFO.npk2gif
             }
             catch (NpkException ex)
             {
-                Console.Error.WriteLine("There was an error while loading the NPK file. The file format may have changed. Here is some information that may help debug the issue: {0}\n\n{1}", ex.Message, ex.StackTrace);
+                Console.Error.WriteLine("There was an error while loading the NPK file. The file format may have changed. Here is some information that may help debug the issue: {0}\n\n{1}", Utils.GetExceptionMessageWithInnerExceptions(ex), ex.StackTrace);
                 Environment.Exit(1);
             }
             catch (Exception ex)
@@ -190,7 +191,7 @@ namespace DFO.npk2gif
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Error creating output directory for {0}: {1}", outputPath, ex.Message);
+                Console.Error.WriteLine("Error creating output directory for {0}: {1}", outputPath, Utils.GetExceptionMessageWithInnerExceptions(ex));
                 Environment.Exit(1);
             }
         }
@@ -203,7 +204,7 @@ namespace DFO.npk2gif
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Error opening {0} for output: {1}", outputPath, ex.Message);
+                Console.Error.WriteLine("Error opening {0} for output: {1}", outputPath, Utils.GetExceptionMessageWithInnerExceptions(ex));
                 Environment.Exit(1);
                 return null; // not reached
             }

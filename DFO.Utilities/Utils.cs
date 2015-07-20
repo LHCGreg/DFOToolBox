@@ -149,5 +149,24 @@ namespace DFO.Utilities
                 return ret;
             }
         }
+
+        /// <summary>
+        /// Returns ex.Message: innerex1.Message: innerex2.Message, etc
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        public static string GetExceptionMessageWithInnerExceptions(Exception ex)
+        {
+            StringBuilder message = new StringBuilder(ex.Message);
+
+            Exception innerEx = ex.InnerException;
+            while (innerEx != null)
+            {
+                message.Append(": ").Append(innerEx.Message);
+                innerEx = innerEx.InnerException;
+            }
+
+            return message.ToString();
+        }
     }
 }
