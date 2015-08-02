@@ -40,7 +40,7 @@
                  ItemsSource="{Binding InnerFileList}"
                  DisplayMemberPath="Name"
                  IsSynchronizedWithCurrentItem="True"
-                 VirtualizingPanel.IsVirtualizing="False"
+                 VirtualizingPanel.IsVirtualizing="True"
                  SelectedIndex="-1">
             <!-- TODO: Sizing -->
             <!-- TOOO: Icon?-->
@@ -51,7 +51,7 @@
                  ItemsSource="{Binding FrameList}"
                  local:MultiSelect.IsEnabled="True"
                  IsSynchronizedWithCurrentItem="True"
-                 VirtualizingPanel.IsVirtualizing="False"
+                 VirtualizingPanel.IsVirtualizing="True"
                  SelectionMode="Extended"
                  SelectedIndex="-1"
                  ContextMenu="{StaticResource FrameListContextMenu}">
