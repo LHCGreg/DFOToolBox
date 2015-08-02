@@ -28,6 +28,9 @@
                 <Separator />
                 <MenuItem Header="Exit" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.ExitCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.ExitCommandCanExecute}" />
             </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="About..." Command="{Binding ElementName=ThisWindow, Path=ViewCommands.ShowAboutCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.ShowAboutCommandCanExecute}" />
+            </MenuItem>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom" MinHeight="22" Background="Silver">
             <TextBlock Text="{Binding Status}" />

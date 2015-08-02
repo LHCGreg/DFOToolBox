@@ -108,6 +108,31 @@ namespace DFOToolbox
             Window.Close();
         }
 
+        public DelegateCommand ShowAboutCommand { get; private set; }
+
+        private bool _showAboutCommandCanExecute;
+        public bool ShowAboutCommandCanExecute
+        {
+            get { return _showAboutCommandCanExecute; }
+            set { if (value != _showAboutCommandCanExecute) { _showAboutCommandCanExecute = value; OnPropertyChanged(); } }
+        }
+
+        private bool CanShowAbout()
+        {
+            return true;
+        }
+
+        private void RefreshCanShowAbout()
+        {
+            ShowAboutCommandCanExecute = CanShowAbout();
+        }
+
+        private void OnShowAbout()
+        {
+            AboutWindow aboutWindow = new AboutWindow();
+            aboutWindow.ShowDialog();
+        }
+
         public MainWindowViewCommands(MainWindow window, MainWindowViewModel viewModel)
         {
             Window = window;
@@ -116,10 +141,12 @@ namespace DFOToolbox
             OpenCommand = new DelegateCommand(OnOpen); // Don't give a delegate for if the command can execute, the menu item IsEnabled seems buggy when that's done...just manually bind IsEnabled
             QuickSaveAsPngCommand = new DelegateCommand(OnQuickSaveAsPng);
             ExitCommand = new DelegateCommand(OnExit);
+            ShowAboutCommand = new DelegateCommand(OnShowAbout);
 
             RefreshCanOpen();
             RefreshCanQuickSaveAsPng();
             RefreshCanExit();
+            RefreshCanShowAbout();
         }
 
         private void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
