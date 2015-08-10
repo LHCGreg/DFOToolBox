@@ -41,5 +41,38 @@ namespace DFO.Common.Images
             MaxWidth = maxWidth;
             MaxHeight = maxHeight;
         }
+
+        public static void GetNormalizedCoordinates(IEnumerable<FrameInfo> frames, out int smallestX, out int largestX, out int smallestY, out int largestY)
+        {
+            smallestX = int.MaxValue;
+            largestX = 0;
+            smallestY = int.MaxValue;
+            largestY = 0;
+
+            foreach (FrameInfo frame in frames)
+            {
+                int startX = frame.LocationX;
+                int endX = startX + frame.Width - 1;
+                int startY = frame.LocationY;
+                int endY = startY + frame.Height - 1;
+
+                if (startX < smallestX)
+                {
+                    smallestX = startX;
+                }
+                if (endX > largestX)
+                {
+                    largestX = endX;
+                }
+                if (startY < smallestY)
+                {
+                    smallestY = startY;
+                }
+                if (endY > largestY)
+                {
+                    largestY = endY;
+                }
+            }
+        }
     }
 }

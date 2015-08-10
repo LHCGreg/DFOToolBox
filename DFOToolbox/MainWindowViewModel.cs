@@ -35,6 +35,14 @@ namespace DFOToolbox
             set { _frameList = value; OnPropertyChanged(); }
         }
 
+        // For all frames together. Set when the selected .img changes.
+        private int _smallestX;
+        private int _largestX;
+        private int _smallestY;
+        private int _largestY;
+        private int _width;
+        private int _height;
+
         private ImageSource _currentFrameImage;
         public ImageSource CurrentFrameImage
         {
@@ -113,7 +121,7 @@ namespace DFOToolbox
             {
                 return;
             }
-            
+
             // TODO: async?
             try
             {
@@ -177,6 +185,22 @@ namespace DFOToolbox
                 return;
             }
 
+            _smallestX = 0;
+            _largestX = 0;
+            _smallestY = 0;
+            _largestY = 0;
+            _width = 1;
+            _height = 1;
+
+            List<FrameInfo> nonLinkFrames = frames.Where(f => f.LinkFrame == null).ToList();
+
+            if (nonLinkFrames.Count > 0)
+            {
+                FrameInfo.GetNormalizedCoordinates(nonLinkFrames, out _smallestX, out _largestX, out _smallestY, out _largestY);
+                _width = _largestX - _smallestX + 1;
+                _height = _largestY - _smallestY + 1;
+            }
+
             // Populate frame list
             for (int frameIndex = 0; frameIndex < frames.Count; frameIndex++)
             {
@@ -187,7 +211,7 @@ namespace DFOToolbox
                     int linkIndex = frame.LinkFrame.Value;
                     if (linkIndex < 0 || linkIndex >= frames.Count)
                     {
-                        // todo: Log error that link is out of range?
+                        // TODO: Log error that link is out of range?
                         FrameList.Add(new FrameMetadata(frameIndex, 0, 0, 0, 0, linkIndex));
                     }
                     else
@@ -232,33 +256,74 @@ namespace DFOToolbox
                 return;
             }
 
+            // Adjust position in bounding box according to frame coordinates
+            // go from (0, 0) based coordinates to (_smallestX, _smallestY) based coordinates
+            // (0, 0) -> (45, 50)
+            // (60, 55) -> (15, 5)
+            // frame x - _smallestX = bounding box X
+            // frame y - _smallestY = bounding box y
+            // Paint image in bounding box
+
             // RGBA -> BGRA (for little endian platforms), (BGRA for big endian platforms) - seems to not be reversed for little endian???
             // TODO: Make NpkReader able to output in variable format so it doesn't need to be converted
-            byte[] convertedBytes = new byte[image.PixelData.Length];
+            byte[] frameBytes = new byte[_width * _height * 4];
             bool isLittleEndian = BitConverter.IsLittleEndian;
 
-            if (isLittleEndian)
+            // Get X in frame
+            // bounding box X + _smallestX = frame x
+            // (5, 0) 5x5
+            // (3, 1), 10x6
+            // smallest x: 3
+            // smallest y: 0
+            // (0, 0): 0 + 3
+            for (int boundingBoxY = 0; boundingBoxY < _height; boundingBoxY++)
             {
-                for (int i = 0; i < image.PixelData.Length; i += 4)
+                int frameY = boundingBoxY + _smallestY;
+                int rowOffset = boundingBoxY * _width * 4;
+
+                // if this row is above or below the current frame, draw a row of transparent pixels
+                if (frameY < image.Attributes.LocationY || frameY > image.Attributes.LocationY + image.Attributes.Height - 1)
                 {
-                    convertedBytes[i] = image.PixelData[i + 2]; // B
-                    convertedBytes[i + 1] = image.PixelData[i + 1]; // G
-                    convertedBytes[i + 2] = image.PixelData[i]; // R
-                    convertedBytes[i + 3] = image.PixelData[i + 3]; // A
+                    for (int boundingBoxX = 0; boundingBoxX < _width; boundingBoxX++)
+                    {
+                        int pixelOffset = rowOffset + (boundingBoxX * 4);
+                        frameBytes[pixelOffset] = 0;
+                        frameBytes[pixelOffset + 1] = 0;
+                        frameBytes[pixelOffset + 2] = 0;
+                        frameBytes[pixelOffset + 3] = 0;
+                    }
                 }
-            }
-            else
-            {
-                for (int i = 0; i < image.PixelData.Length; i += 4)
+                else
                 {
-                    convertedBytes[i] = image.PixelData[i + 2]; // B
-                    convertedBytes[i + 1] = image.PixelData[i + 1]; // G
-                    convertedBytes[i + 2] = image.PixelData[i]; // R
-                    convertedBytes[i + 3] = image.PixelData[i + 3]; // A
+                    for (int boundingBoxX = 0; boundingBoxX < _width; boundingBoxX++)
+                    {
+                        int frameX = boundingBoxX + _smallestX;
+                        int pixelOffset = rowOffset + (boundingBoxX * 4);
+
+                        // if this column is to the left or right of the current frame, draw a transparent pixel
+                        if (frameX < image.Attributes.LocationX || frameX > image.Attributes.LocationX + image.Attributes.Width - 1)
+                        {
+                            frameBytes[pixelOffset] = 0;
+                            frameBytes[pixelOffset + 1] = 0;
+                            frameBytes[pixelOffset + 2] = 0;
+                            frameBytes[pixelOffset + 3] = 0;
+                        }
+                        else
+                        {
+                            // RGBA -> BGRA
+                            int zeroBasedFrameY = frameY - image.Attributes.LocationY;
+                            int zeroBasedFrameX = frameX - image.Attributes.LocationX;
+                            int framePixelOffset = zeroBasedFrameY * image.Attributes.Width * 4 + zeroBasedFrameX * 4;
+                            frameBytes[pixelOffset] = image.PixelData[framePixelOffset + 2];  // B
+                            frameBytes[pixelOffset + 1] = image.PixelData[framePixelOffset + 1]; // G
+                            frameBytes[pixelOffset + 2] = image.PixelData[framePixelOffset]; // R
+                            frameBytes[pixelOffset + 3] = image.PixelData[framePixelOffset + 3]; // A
+                        }
+                    }
                 }
             }
 
-            CurrentFrameImage = BitmapSource.Create(frame.Width, frame.Height, dpiX: 96, dpiY: 96, pixelFormat: PixelFormats.Bgra32, palette: null, pixels: convertedBytes, stride: 4 * frame.Width);
+            CurrentFrameImage = BitmapSource.Create(_width, _height, dpiX: 96, dpiY: 96, pixelFormat: PixelFormats.Bgra32, palette: null, pixels: frameBytes, stride: 4 * _width);
         }
 
         /// <summary>

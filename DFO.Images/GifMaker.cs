@@ -57,10 +57,10 @@ namespace DFO.Images
             int largestY;
 
             // Frames can have different start positions and widths/heights. Normalize the images to a common coordinate system.
-            GetNormalizedCoordinates(rawFrames, out smallestX, out largestX, out smallestY, out largestY);
+            FrameInfo.GetNormalizedCoordinates(rawFrames.Select(image => image.Attributes), out smallestX, out largestX, out smallestY, out largestY);
 
-            int normalizedWidth = largestX - smallestX;
-            int normalizedHeight = largestY - smallestY;
+            int normalizedWidth = largestX - smallestX + 1;
+            int normalizedHeight = largestY - smallestY + 1;
 
             List<MagickImage> renderedFrames = new List<MagickImage>();
 
@@ -88,42 +88,9 @@ namespace DFO.Images
             }
         }
 
-        private void GetNormalizedCoordinates(List<Image> rawFrames, out int smallestX, out int largestX, out int smallestY, out int largestY)
-        {
-            smallestX = int.MaxValue;
-            largestX = 0;
-            smallestY = int.MaxValue;
-            largestY = 0;
-
-            foreach (Image rawFrame in rawFrames)
-            {
-                int startX = rawFrame.Attributes.LocationX;
-                int endX = startX + rawFrame.Attributes.Width;
-                int startY = rawFrame.Attributes.LocationY;
-                int endY = startY + rawFrame.Attributes.Height;
-
-                if (startX < smallestX)
-                {
-                    smallestX = startX;
-                }
-                if (endX > largestX)
-                {
-                    largestX = endX;
-                }
-                if (startY < smallestY)
-                {
-                    smallestY = startY;
-                }
-                if (endY > largestY)
-                {
-                    largestY = endY;
-                }
-            }
-        }
-
         private MagickImage RenderFrame(Image rawFrameImage, ConstAnimationFrame frameAnimationInfo, int smallestX, int largestX, int smallestY, int largestY, int normalizedWidth, int normalizedHeight)
         {
-            MagickImage renderedFrame = new MagickImage(new MagickColor(0, 0, 0, 0), (int)normalizedWidth, (int)normalizedHeight);
+            MagickImage renderedFrame = new MagickImage(new MagickColor(0, 0, 0, 0), normalizedWidth, normalizedHeight);
 
             int normalizedFrameX = rawFrameImage.Attributes.LocationX - smallestX;
             int normalizedFrameY = rawFrameImage.Attributes.LocationY - smallestY;
@@ -142,7 +109,7 @@ namespace DFO.Images
                 {
                     rawFrameMagickImage.Format = MagickFormat.Gif;
                     rawFrameMagickImage.MatteColor = new MagickColor(0, 0, 0, 0);
-                    renderedFrame.Composite(rawFrameMagickImage, (int)normalizedFrameX, (int)normalizedFrameY, CompositeOperator.Over);
+                    renderedFrame.Composite(rawFrameMagickImage, normalizedFrameX, normalizedFrameY, CompositeOperator.Over);
                 }
             }
 
