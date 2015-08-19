@@ -23,7 +23,16 @@ namespace DFO.npkdiff
         public CommandLineArgs(string[] args)
         {
             OptionSet optionSet = GetOptionSet();
-            optionSet.Parse(args);
+
+            try
+            {
+                optionSet.Parse(args);
+            }
+            catch (OptionException ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+                Environment.Exit(1);
+            }
 
             if (ShowHelp)
             {

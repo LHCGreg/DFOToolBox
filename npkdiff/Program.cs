@@ -13,16 +13,23 @@ namespace DFO.npkdiff
     {
         static void Main(string[] args)
         {
-            CommandLineArgs cmdline = new CommandLineArgs(args);
+            try
+            {
+                CommandLineArgs cmdline = new CommandLineArgs(args);
 
-            // read *.NPK in NpkDir1
-            // read *.NPK in NpkDir2
-            // Compare
+                // read *.NPK in NpkDir1
+                // read *.NPK in NpkDir2
+                // Compare
 
-            NpkDirContents dir1Contents = GetNpkDirContents(cmdline.NpkDir1);
-            NpkDirContents dir2Contents = GetNpkDirContents(cmdline.NpkDir2);
-            NpkDirDifferences differences = dir1Contents.GetDifferences(dir2Contents);
-            DisplayDifferences(differences);
+                NpkDirContents dir1Contents = GetNpkDirContents(cmdline.NpkDir1);
+                NpkDirContents dir2Contents = GetNpkDirContents(cmdline.NpkDir2);
+                NpkDirDifferences differences = dir1Contents.GetDifferences(dir2Contents);
+                DisplayDifferences(differences);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Unexpected error: {0}", ex.Message);
+            }
         }
 
         static NpkDirContents GetNpkDirContents(string npkDir)
