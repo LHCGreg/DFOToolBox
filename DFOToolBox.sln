@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFOToolbox", "DFOToolbox\DF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFO.Npk.IntegrationTests", "DFO.Npk.IntegrationTests\DFO.Npk.IntegrationTests.csproj", "{24DD7BAA-7B3A-420E-9D99-B0ADD7F41C5E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "npkdiff", "npkdiff\npkdiff.csproj", "{C58E88D3-C68E-485B-9F37-92634216C182}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{24DD7BAA-7B3A-420E-9D99-B0ADD7F41C5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24DD7BAA-7B3A-420E-9D99-B0ADD7F41C5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24DD7BAA-7B3A-420E-9D99-B0ADD7F41C5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C58E88D3-C68E-485B-9F37-92634216C182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C58E88D3-C68E-485B-9F37-92634216C182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C58E88D3-C68E-485B-9F37-92634216C182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C58E88D3-C68E-485B-9F37-92634216C182}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
