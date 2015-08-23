@@ -10,12 +10,16 @@ using Microsoft.Practices.Prism.Commands;
 
 namespace DFOToolbox
 {
+    /// <summary>
+    /// Stub viewmodel for the main window used to provide data to be shown in the designer view in Visual Studio.
+    /// </summary>
     public class DesignerMainWindowViewModel : IMainWindowViewModel
     {
         public InnerNpkFileList InnerFileList { get; set; }
         public FrameList FrameList { get; set; }
         public ImageSource CurrentFrameImage { get; set; }
         public string Status { get; set; }
+        public string OpenNPKPath { get; set; }
         public bool CanOpen { get; set; }
         public bool CanQuickSaveAsPng { get; set; }
 
@@ -23,10 +27,12 @@ namespace DFOToolbox
         {
             InnerFileList = new InnerNpkFileList()
             {
-                new InnerNpkFile("foo.img", "images/foo.img"),
-                new InnerNpkFile("bar.img", "images/bar.img"),
-                new InnerNpkFile("baz.img", "Images/baz.img")
+                new InnerNpkFile("blahblahblah_0.img", "sprite/character/fighter/blahblahblah_0.img"),
+                new InnerNpkFile("blahblahblah_1.img", "sprite/character/fighter/blahblahblah_1.img"),
+                new InnerNpkFile("blahblahblah_2.img", "sprite/character/fighter/blahblahblah_2.img")
             };
+
+            InnerFileList.MoveCurrentToFirst();
 
             FrameList = new FrameList()
             {
@@ -37,6 +43,7 @@ namespace DFOToolbox
 
             CurrentFrameImage = null;
             Status = "I'm the status";
+            OpenNPKPath = @"C:\Neople\DFO\ImagePacks2\blah.NPK";
             CanOpen = true;
             CanQuickSaveAsPng = true;
         }

@@ -15,6 +15,7 @@ namespace DFOToolbox
         FrameList FrameList { get; set; }
         ImageSource CurrentFrameImage { get; set; }
         string Status { get; set; }
+        string OpenNPKPath { get; set; }
 
         void Open(string npkPath);
         bool CanOpen { get; set; }

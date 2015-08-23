@@ -57,6 +57,16 @@ namespace DFOToolbox
             set { _status = value; OnPropertyChanged(); }
         }
 
+        private string _openNPKPath;
+        /// <summary>
+        /// Full path of the currently open NPK file. Null if none opened currently.
+        /// </summary>
+        public string OpenNPKPath
+        {
+            get { return _openNPKPath; }
+            set { _openNPKPath = value; OnPropertyChanged(); }
+        }
+
         // Wiring up command objects' CanExecute() seems complicated and/or inefficient, so just expose a property for that.
         // This way changes can be notified.
 
@@ -140,6 +150,8 @@ namespace DFOToolbox
                 MessageBox.Show(string.Format("Error opening NPK file: {0}", ex.Message));
                 return;
             }
+
+            OpenNPKPath = npkPath;
 
             InnerFileList.Clear();
             FrameList.Clear();

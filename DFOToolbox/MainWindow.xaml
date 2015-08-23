@@ -21,6 +21,7 @@
         </ContextMenu>
     </Window.Resources>
     <DockPanel designer:DataContext="{Binding Source={StaticResource DesignViewModel}}">
+        <!-- Menu -->
         <Menu DockPanel.Dock="Top" Height="27" VerticalAlignment="Top" >
             <MenuItem Header="File">
                 <MenuItem Header="Open" InputGestureText="Ctrl+O" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommandCanExecute}" />
@@ -35,6 +36,13 @@
         <StatusBar DockPanel.Dock="Bottom" MinHeight="22" Background="Silver">
             <TextBlock Text="{Binding Status}" />
         </StatusBar>
+        <!-- NPK and .img display -->
+        <StackPanel DockPanel.Dock="Top">
+            <TextBlock Margin="20,10,40,3" Text="{Binding Path=OpenNPKPath}"></TextBlock>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <TextBlock Margin="20,0,40,10" Text="{Binding Path=InnerFileList.Current.Path}"></TextBlock>
+        </StackPanel>
         <!-- Inner file (.img) listbox -->
         <ListBox DockPanel.Dock="Left" Width="200" HorizontalAlignment="Left"
                  ItemsSource="{Binding InnerFileList}"

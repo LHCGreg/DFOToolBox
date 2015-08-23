@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace DFOToolbox
         public StrongListCollectionView()
             : base(new ObservableCollection<T>())
         {
-
+            this.CurrentChanged += (sender, e) => OnPropertyChanged(new PropertyChangedEventArgs(PropNameCurrent));
         }
 
         public StrongListCollectionView(ObservableCollection<T> values)
@@ -32,6 +33,7 @@ namespace DFOToolbox
             InternalList.Add(item);
         }
 
+        private const string PropNameCurrent = "Current";
         public T Current { get { return (T)CurrentItem; } }
     }
 }
