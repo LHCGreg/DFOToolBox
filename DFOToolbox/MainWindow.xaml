@@ -6,7 +6,7 @@
         mc:Ignorable="designer"
         xmlns:vm="clr-namespace:DFOToolbox"
         xmlns:local="clr-namespace:DFOToolbox"
-        Title="DFO Toolbox" Height="600" Width="1000"
+        Title="DFO Toolbox" Height="650" Width="1000" WindowState="Maximized"
         Name="ThisWindow"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Self}}">
     <Window.InputBindings>
@@ -33,7 +33,9 @@
                 <MenuItem Header="About..." Command="{Binding ElementName=ThisWindow, Path=ViewCommands.ShowAboutCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.ShowAboutCommandCanExecute}" />
             </MenuItem>
         </Menu>
-        <StatusBar DockPanel.Dock="Bottom" MinHeight="22" Background="Silver">
+        <!-- Status bar -->
+        <StatusBar DockPanel.Dock="Bottom" MinHeight="22" Background="Silver"
+                   Margin="0,5,0,0">
             <TextBlock Text="{Binding Status}" />
         </StatusBar>
         <!-- NPK and .img display -->
@@ -44,7 +46,7 @@
             <TextBlock Margin="20,0,40,10" Text="{Binding Path=InnerFileList.Current.Path}"></TextBlock>
         </StackPanel>
         <!-- Inner file (.img) listbox -->
-        <ListBox DockPanel.Dock="Left" Width="200" HorizontalAlignment="Left"
+        <ListBox DockPanel.Dock="Left" Width="200" HorizontalAlignment="Left" BorderThickness="1" Margin="20,0,10,0"
                  ItemsSource="{Binding InnerFileList}"
                  DisplayMemberPath="Name"
                  IsSynchronizedWithCurrentItem="True"
@@ -55,7 +57,7 @@
         </ListBox>
         <!-- Frame listbox -->
         <!-- local:MultiSelect.IsEnabled="True" is custom binding for multiselect listboxes because WPF doesn't have it built in -_- -->
-        <ListBox DockPanel.Dock="Top"  Height="200" VerticalAlignment="Top"
+        <ListBox DockPanel.Dock="Top" Height="200" VerticalAlignment="Top" BorderThickness="1" Margin="10,0,20,0"
                  ItemsSource="{Binding FrameList}"
                  local:MultiSelect.IsEnabled="True"
                  IsSynchronizedWithCurrentItem="True"
@@ -74,7 +76,9 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <!-- Image display area -->
-        <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+        <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True"
+                Margin="10,0,20,0"
+                Background="LightGray">
             <Image Source="{Binding Path=CurrentFrameImage}" />
         </Canvas>
     </DockPanel>
