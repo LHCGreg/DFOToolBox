@@ -103,10 +103,10 @@ namespace DFO.npk2gif
             {
                 NpkPath imgPath = new NpkPath(cmdLine.ImgPath);
                 IList<NpkPath> imgPathComponents = imgPath.GetPathComponents();
-                if (imgPathComponents.Count >= 1 && imgPathComponents[0].Path.Equals("sprite", StringComparison.OrdinalIgnoreCase))
+                if (imgPathComponents.Count >= 1 && !imgPathComponents[0].Path.Equals("sprite", StringComparison.OrdinalIgnoreCase))
                 {
-                    // strip sprite/ prefix if present
-                    imgPath = imgPath.StripPrefix();
+                    // add sprite/ prefix if present
+                    imgPath = NpkPath.Combine("sprite", imgPath);
                 }
 
                 if (!npk.Images.ContainsKey(imgPath))

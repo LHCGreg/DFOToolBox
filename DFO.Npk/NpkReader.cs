@@ -261,24 +261,18 @@ namespace DFO.Npk
                     NpkPath pathWithPrefix = new NpkPath(subNameString);
 
                     // That gives a path like sprite/character/gunner/effect/aerialdashattack.img
-                    // We need to strip off the sprite/ or sound/ prefix.
-                    // The following code assumes that a prefix of, say, sprite// or sprite\ is still valid.
-                    // If not, the code could be simplified.
                     IList<NpkPath> pathComponents = pathWithPrefix.GetPathComponents();
                     if (pathComponents.Count >= 1)
                     {
-                        // Build up the NpkPath that is the same NpkPath but without the first component
-                        NpkPath pathWithoutPrefix = pathWithPrefix.StripPrefix();
-
                         NpkByteRange fileLocation = new NpkByteRange(absoluteLocation, (int)size);
                         if (pathComponents[0].Equals("sprite"))
                         {
-                            m_imageFileLocations[pathWithoutPrefix] = fileLocation;
-                            m_imagesInFile[pathWithoutPrefix] = true;
+                            m_imageFileLocations[pathWithPrefix] = fileLocation;
+                            m_imagesInFile[pathWithPrefix] = true;
                         }
                         else if (pathComponents[0].Equals("sounds"))
                         {
-                            m_soundFileLocations[pathWithoutPrefix] = fileLocation;
+                            m_soundFileLocations[pathWithPrefix] = fileLocation;
                         }
                         else
                         {
@@ -316,11 +310,11 @@ namespace DFO.Npk
         }
 
         /// <summary>
-        /// Preloads frame metadata for the .img file with the given path without a leading sprite/.
+        /// Preloads frame metadata for the .img file with the given path with a leading sprite/ if present.
         /// If the metadata has already been loaded, does nothing.
         /// Metadata for an .img's frames are loaded on demand otherwise.
         /// </summary>
-        /// <param name="spriteFilePath">NPK path of the .img file to preload. Must not contain a leading sprite/</param>
+        /// <param name="spriteFilePath">NPK path of the .img file to preload. Must contain a leading sprite/ if present in the actual path.</param>
         /// <exception cref="System.IO.FileNotFoundException">There is no .img file in the NPK with the given path.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
         /// <exception cref="Dfo.Npk.NpkException">The .npk file is corrupt or the format changed.</exception>
@@ -565,7 +559,7 @@ namespace DFO.Npk
         /// <summary>
         /// Loads the pixels of a frame.
         /// </summary>
-        /// <param name="imgPath">The Npk Path of the .img file, WITHOUT the leading sprite/</param>
+        /// <param name="imgPath">The Npk Path of the .img file, with the leading sprite/ if present</param>
         /// <param name="frameIndex"></param>
         /// <returns></returns>
         /// <exception cref="System.IO.FileNotFoundException">The img file does not exist in this .npk file

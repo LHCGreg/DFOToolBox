@@ -15,7 +15,13 @@ namespace DFO.Common.Tests
             NpkPath testPath = "Interface/Emoticon/Against.img";
             Assert.That(testPath.GetImageNpkName(), Is.EqualTo("sprite_Interface_Emoticon.npk"));
 
+            testPath = "sprite/Interface/Emoticon/Against.img";
+            Assert.That(testPath.GetImageNpkName(), Is.EqualTo("sprite_Interface_Emoticon.npk"));
+
             testPath = "equip/armor/cloth_touch.wav";
+            Assert.That(testPath.GetSoundNpkName(), Is.EqualTo("sounds_equip_armor.npk"));
+
+            testPath = "sounds/equip/armor/cloth_touch.wav";
             Assert.That(testPath.GetSoundNpkName(), Is.EqualTo("sounds_equip_armor.npk"));
 
             testPath = "/";

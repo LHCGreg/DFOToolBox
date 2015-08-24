@@ -7,11 +7,9 @@ using DFO.Utilities;
 namespace DFO.Common
 {
     /// <summary>
-    /// Represents the path of an image or sound located in a .npk file. Example: Interface/Emoticon/Against.img.
+    /// Represents the path of an image or sound located in a .npk file. Example: Sprite/Interface/Emoticon/Against.img.
     /// Npk Paths are not case-sensitive and may use either slashes or backslashes as separators.
-    /// An Npk Path should NOT contain a leading "sprite/" or "sounds/". Code that may use such paths is
-    /// responsible for using that prefix to identify the string as an Npk Path and then stripping the prefix
-    /// to create the real Npk Path.
+    /// An Npk Path should contain a leading "sprite/" or "sounds/".
     /// </summary>
     public class NpkPath : IEquatable<NpkPath>
     {
@@ -57,7 +55,7 @@ namespace DFO.Common
 
         /// <summary>
         /// Gets a list containing the components of this Npk Path. For example, the components of
-        /// character/gunner/effect/aerialdashattack.img are "character", "gunner", "effect", and
+        /// sprite/character/gunner/effect/aerialdashattack.img are "sprite", "character", "gunner", "effect", and
         /// "aerialdashattack.img". The root directory has 0 components.
         /// </summary>
         /// <returns></returns>
@@ -73,19 +71,21 @@ namespace DFO.Common
         }
 
         /// <summary>
-        /// Gets the name of the .npk file that an image file with this npk path would be in.
+        /// Gets the name of the .npk file that an image file with this npk path would normally be in.
+        /// For example, sprite/interface/emoticon/against.img -> sprite_interface_emoticon.npk.
+        /// There are plenty of exceptions to this.
         /// </summary>
         /// <returns></returns>
         public string GetImageNpkName()
         {
-            // Example: Interface/Emoticon/Against.img -> sprite_Interface_Emoticon.npk
             // Get the path components, add a new path component "sprite" at the beginning, leave out the
             // file name (the last path component), join the new components with underscores, and append .npk
             return GetNpkName("sprite");
         }
 
         /// <summary>
-        /// Gets the name of the .npk file that a sound file with this npk path would be in.
+        /// Gets the name of the .npk file that a sound file with this npk path would normally be in.
+        /// There are plenty of exceptions to this.
         /// </summary>
         /// <returns></returns>
         public string GetSoundNpkName()
@@ -100,6 +100,12 @@ namespace DFO.Common
             npkBuilder.Append(prefix);
             for (int componentIndex = 0; componentIndex < pathComponents.Count - 1; componentIndex++)
             {
+                // If prefix is already the first component, skip to the next component
+                if (componentIndex == 0 && pathComponents[componentIndex].ToString().Equals(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                
                 npkBuilder.Append("_");
                 npkBuilder.Append(pathComponents[componentIndex].ToString());
             }
