@@ -359,10 +359,24 @@ namespace DFO.Npk
                     throw new NpkException("Did not find expected image file header when reading {0}.".F(spriteFilePath));
                 }
 
-                // Don't know what these 4 bytes, 4 bytes, and 4 bytes are
-                uint unknown1 = GetUnsigned32Le();
-                uint unknown2 = GetUnsigned32Le();
-                uint unknown3 = GetUnsigned32Le();
+                // 32-bit unsigned int - this field seems to be 36 * (# non-link frames) + 8 * (# link frames). A scan of all NPKs bears this out.
+                uint field1 = GetUnsigned32Le();
+
+                // 32-bit unsigned int - this field seems to be always 0. A scan of all NPKs bears this out.
+                uint field2 = GetUnsigned32Le();
+
+                if (DoExtraErrorChecks && field2 != 0)
+                {
+                    OnErrorDetected(string.Format("Field 2 in {0} is {1}, not 0 as expected.", spriteFilePath, field2));
+                }
+
+                // 32-bit unsigned int - this field seems to be always 2 (some sort of version number perhaps?). A scan of all NPKs bears this out.
+                uint field3 = GetUnsigned32Le();
+
+                if (DoExtraErrorChecks && field3 != 2)
+                {
+                    OnErrorDetected(string.Format("Field 3 in {0} is {1}, not 2 as expected.", spriteFilePath, field3));
+                }
 
                 // 32-bit unsigned int - number of frames in the .img file
                 uint numFrames = GetUnsigned32Le();
@@ -375,6 +389,17 @@ namespace DFO.Npk
                 {
                     FrameInfo frame = ReadFrameMetadata();
                     frames.Add(frame);
+                }
+
+                if (DoExtraErrorChecks)
+                {
+                    int numLinkFrames = frames.Where(f => f.LinkFrame != null).Count();
+                    int numNonLinkFrames = frames.Count - numLinkFrames;
+                    int expectedField1Value = 36 * numNonLinkFrames + 8 * numLinkFrames;
+                    if (field1 != expectedField1Value)
+                    {
+                        OnErrorDetected(string.Format("Field 1 in {0} is {1}, not {2} as expected.", spriteFilePath, field1, expectedField1Value));
+                    }
                 }
 
                 // Next is each non-reference frame's pixel data, one after the other.
