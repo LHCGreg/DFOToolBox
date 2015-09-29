@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DFO.Utilities;
 
 namespace DFO.Common.Images
 {
@@ -40,6 +41,45 @@ namespace DFO.Common.Images
             LocationY = locationY;
             MaxWidth = maxWidth;
             MaxHeight = maxHeight;
+        }
+
+        public int GetPixelDataLength()
+        {
+            if (PixelFormat == PixelDataFormat.Link)
+            {
+                return 0;
+            }
+
+            if (IsCompressed)
+            {
+                return CompressedLength;
+            }
+            else
+            {
+                return Width * Height * GetBytesPerPixel();
+            }
+        }
+
+        public static int GetBytesPerPixel(PixelDataFormat pixelFormat)
+        {
+            switch(pixelFormat)
+            {
+                case PixelDataFormat.EightEightEightEight:
+                    return 4;
+                case PixelDataFormat.FourFourFourFour:
+                    return 2;
+                case PixelDataFormat.OneFiveFiveFive:
+                    return 2;
+                case PixelDataFormat.Link:
+                    return 0;
+                default:
+                    throw new Exception("Invalid pixel format {0}.".F(pixelFormat));
+            }
+        }
+
+        public int GetBytesPerPixel()
+        {
+            return GetBytesPerPixel(PixelFormat);
         }
 
         public static void GetNormalizedCoordinates(IEnumerable<FrameInfo> frames, out int smallestX, out int largestX, out int smallestY, out int largestY)

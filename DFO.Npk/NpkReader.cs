@@ -18,10 +18,16 @@ namespace DFO.Npk
 
         private byte[] m_intBuffer = new byte[4];
 
-        private static string s_keyString = "puchikon@neople dungeon and fighter DNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNF\0";
-        private static byte[] s_key = Encoding.ASCII.GetBytes(s_keyString);
+        internal static string s_headerString = "NeoplePack_Bill\0";
+        internal static byte[] s_headerBytes = Encoding.ASCII.GetBytes(s_headerString);
 
-        private static IDictionary<PixelDataFormat, int> s_formatToBytesPerPixel = new Dictionary<PixelDataFormat, int>()
+        internal static string s_keyString = "puchikon@neople dungeon and fighter DNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNFDNF\0";
+        internal static byte[] s_key = Encoding.ASCII.GetBytes(s_keyString);
+
+        internal static string s_imgHeaderString = "Neople Img File\0";
+        internal static byte[] s_imgHeaderBytes = Encoding.ASCII.GetBytes(s_imgHeaderString);
+
+        internal static IDictionary<PixelDataFormat, int> s_formatToBytesPerPixel = new Dictionary<PixelDataFormat, int>()
         {
             { PixelDataFormat.EightEightEightEight, 4 },
             { PixelDataFormat.FourFourFourFour, 2 },
@@ -31,11 +37,20 @@ namespace DFO.Npk
 
         private Dictionary<NpkPath, NpkByteRange> m_imageFileLocations = new Dictionary<NpkPath, NpkByteRange>();
         private Dictionary<NpkPath, bool> m_imagesInFile = new Dictionary<NpkPath, bool>();
+
+        /// <summary>
+        /// Accessing this property will not automatically load frame metadata for any .img's.
+        /// </summary>
         public IReadOnlyDictionary<NpkPath, bool> Images { get { return m_imagesInFile; } }
 
         private Dictionary<NpkPath, NpkByteRange> m_soundFileLocations = new Dictionary<NpkPath, NpkByteRange>();
 
         private Dictionary<NpkPath, List<NpkByteRange>> m_frameLocations = new Dictionary<NpkPath, List<NpkByteRange>>();
+
+        /// <summary>
+        /// The frame's metadata must be loaded first.
+        /// </summary>
+        internal Dictionary<NpkPath, List<NpkByteRange>> FrameLocations { get { return m_frameLocations; } }
 
         // If this is re-set, Images must be updated to point to the new value.
         private Dictionary<NpkPath, List<FrameInfo>> m_frames = new Dictionary<NpkPath, List<FrameInfo>>();
@@ -53,6 +68,12 @@ namespace DFO.Npk
         /// Not currently populated.
         /// </summary>
         public IReadOnlyDictionary<NpkPath, SoundInfo> Sounds { get; private set; }
+
+        private List<NpkFileTableEntry> _files = new List<NpkFileTableEntry>();
+        /// <summary>
+        /// Table of all files in the NPK and their locations. Note that it is permitted for multiple files to occupy the same space.
+        /// </summary>
+        internal IReadOnlyList<NpkFileTableEntry> Files { get { return _files; } }
 
         /// <summary>
         /// Set to true to do extra error checks that are not normally done because they have a performance hit.
@@ -235,6 +256,7 @@ namespace DFO.Npk
 
                 // Next is a 32-bit unsigned int that is the number of files packed in the .npk
                 uint numFiles = GetUnsigned32Le();
+                _files = new List<NpkFileTableEntry>((int)numFiles);
 
                 byte[] subNameBuffer = new byte[256];
                 // Next is a listing of all the files and their location inside the file.
@@ -260,11 +282,13 @@ namespace DFO.Npk
                     subNameString = subNameString.TrimEnd('\0');
                     NpkPath pathWithPrefix = new NpkPath(subNameString);
 
+                    _files.Add(new NpkFileTableEntry(pathWithPrefix, new NpkByteRange((int)absoluteLocation, (int)size)));
+
                     // That gives a path like sprite/character/gunner/effect/aerialdashattack.img
                     IList<NpkPath> pathComponents = pathWithPrefix.GetPathComponents();
                     if (pathComponents.Count >= 1)
                     {
-                        NpkByteRange fileLocation = new NpkByteRange(absoluteLocation, (int)size);
+                        NpkByteRange fileLocation = new NpkByteRange((int)absoluteLocation, (int)size);
                         if (pathComponents[0].Equals("sprite"))
                         {
                             m_imageFileLocations[pathWithPrefix] = fileLocation;
@@ -350,11 +374,10 @@ namespace DFO.Npk
                 Seek(spriteFileLocation.FileOffset, SeekOrigin.Begin);
 
                 // .img files begin with "Neople Img File\0" in ASCII
-                string imageFileHeader = "Neople Img File\0";
-                byte[] headerBuffer = new byte[imageFileHeader.Length];
+                byte[] headerBuffer = new byte[s_imgHeaderBytes.Length];
                 m_npkStream.ReadOrDie(headerBuffer, headerBuffer.Length);
                 string headerString = Encoding.ASCII.GetString(headerBuffer);
-                if (!string.Equals(imageFileHeader, headerString, StringComparison.Ordinal))
+                if (!string.Equals(s_imgHeaderString, headerString, StringComparison.Ordinal))
                 {
                     throw new NpkException("Did not find expected image file header when reading {0}.".F(spriteFilePath));
                 }
@@ -403,7 +426,7 @@ namespace DFO.Npk
                 }
 
                 // Next is each non-reference frame's pixel data, one after the other.
-                long currentFramePosition = m_npkStream.Position;
+                int currentFramePosition = (int)m_npkStream.Position;
                 for (uint frameIndex = 0; frameIndex < numFrames; frameIndex++)
                 {
                     FrameInfo frame = frames[(int)frameIndex];

@@ -18,21 +18,55 @@ namespace DFO.Sandbox
     {
         static void Main(string[] args)
         {
-            foreach (string path in Directory.GetFiles(@"C:\Neople\DFO\ImagePacks2", "*.NPK"))
+            using (NpkReader npk = new NpkReader(@"C:\Neople\DFO\ImagePacks2\sprite_character_fighter_equipment_avatar_cap.NPK"))
             {
-                using (NpkReader npk = new NpkReader(path))
+                npk.PreLoadAllSpriteFrameMetadata();
+                List<NpkPath> imgs = npk.Frames.Where(kvp => kvp.Value.Any(f => f.CompressedLength == 84)).Select(kvp => kvp.Key).ToList();
+                foreach (NpkPath img in imgs)
                 {
-                    if (npk.Images.Keys.Any(img => img.Path.EndsWith("bufficon.img")))
+                    IReadOnlyList<FrameInfo> frames = npk.Frames[img];
+                    for (int i = 0; i < frames.Count; i++)
                     {
-                        Console.WriteLine(path);
-                        Environment.Exit(0);
+                        if (frames[i].CompressedLength == 84 && !frames[i].IsCompressed)
+                        {
+                            Console.WriteLine(string.Format("{0} {1}", img, i));
+                        }
                     }
-
-                    Console.WriteLine("Read {0}", path);
                 }
             }
 
-            Console.WriteLine("Not found!");
+            Environment.Exit(0);
+            
+            foreach (string path in Directory.GetFiles(@"C:\Neople\DFO\ImagePacks2", "*.NPK"))
+            {
+                Console.WriteLine(path);
+                using (NpkReader npk = new NpkReader(path))
+                {
+                    npk.PreLoadAllSpriteFrameMetadata();
+                    foreach (NpkPath npkPath in npk.Frames.Keys)
+                    {
+                        var x = npk.Frames[npkPath];
+                        for(int i = 0; i < x.Count; i++)
+                        {
+                            FrameInfo frame = x[i];
+                            if (!frame.IsCompressed && frame.LinkFrame == null)
+                            {
+                                string pixelFormatString = frame.PixelFormat.ToString();
+                                int actualLength = frame.Width * frame.Height * 2;
+                                if (frame.PixelFormat == PixelDataFormat.EightEightEightEight)
+                                {
+                                    actualLength *= 2;
+                                }
+                                if (frame.CompressedLength != actualLength)
+                                {
+                                    Console.WriteLine("Pixel Format: {0,22}, Compressed Length: {1,9}, Actual Length: {2,9} {3} {4}", pixelFormatString, frame.CompressedLength, actualLength, npkPath, i);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             Environment.Exit(0);
 
             using (NpkReader npkReader = new NpkReader(@"C:\Neople\DFO\ImagePacks2\sprite_monster_impossible_bakal.NPK"))

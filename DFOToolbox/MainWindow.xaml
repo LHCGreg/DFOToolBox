@@ -12,20 +12,23 @@
     <Window.InputBindings>
         <KeyBinding Key="O" Modifiers="Control" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommand}" />
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.QuickSaveAsPngCommand}" />
+        <KeyBinding Key="E" Modifiers="Control" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.EditFrameCommand}" />
     </Window.InputBindings>
     <Window.Resources>
         <vm:DesignerMainWindowViewModel x:Key="DesignViewModel">
         </vm:DesignerMainWindowViewModel>
         <ContextMenu x:Key="FrameListContextMenu">
             <MenuItem Header="Save As PNG" Command="{Binding Source={x:Reference ThisWindow}, Path=ViewCommands.QuickSaveAsPngCommand}" />
+            <MenuItem Header="Edit Frame..." Command="{Binding Source={x:Reference ThisWindow}, Path=ViewCommands.EditFrameCommand}" />
         </ContextMenu>
     </Window.Resources>
     <DockPanel designer:DataContext="{Binding Source={StaticResource DesignViewModel}}">
         <!-- Menu -->
         <Menu DockPanel.Dock="Top" Height="27" VerticalAlignment="Top" >
             <MenuItem Header="File">
-                <MenuItem Header="Open" InputGestureText="Ctrl+O" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommandCanExecute}" />
+                <MenuItem Header="Open..." InputGestureText="Ctrl+O" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.OpenCommandCanExecute}" />
                 <MenuItem Header="Save" InputGestureText="Ctrl+S" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.QuickSaveAsPngCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.QuickSaveAsPngCommandCanExecute}" />
+                <MenuItem Header="Edit Frame..." InputGestureText="Ctrl+E" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.EditFrameCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.EditFrameCommandCanExecute}" />
                 <Separator />
                 <MenuItem Header="Exit" Command="{Binding ElementName=ThisWindow, Path=ViewCommands.ExitCommand}" IsEnabled="{Binding ElementName=ThisWindow, Path=ViewCommands.ExitCommandCanExecute}" />
             </MenuItem>

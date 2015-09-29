@@ -8,6 +8,7 @@ using Microsoft.Practices.Prism.Commands;
 using Microsoft.Win32;
 using DFO.Utilities;
 using DFOToolbox.Models;
+using System.Windows;
 
 namespace DFOToolbox
 {
@@ -84,6 +85,25 @@ namespace DFOToolbox
             ViewModel.Open(npkPath);
         }
 
+        public DelegateCommand EditFrameCommand { get; private set; }
+
+        private bool _editFrameCommandCanExecute;
+        public bool EditFrameCommandCanExecute
+        {
+            get { return _editFrameCommandCanExecute; }
+            set { if (value != _editFrameCommandCanExecute) { _editFrameCommandCanExecute = value; OnPropertyChanged(); } }
+        }
+
+        private bool CanEditFrame()
+        {
+            return ViewModel.CanEditFrame;
+        }
+
+        private void RefreshCanEditFrame()
+        {
+            EditFrameCommandCanExecute = CanEditFrame();
+        }
+
         public DelegateCommand ExitCommand { get; private set; }
 
         private bool _exitCommandCanExecute;
@@ -140,11 +160,13 @@ namespace DFOToolbox
             ViewModel.PropertyChanged += OnViewModelPropertyChanged;
             OpenCommand = new DelegateCommand(OnOpen); // Don't give a delegate for if the command can execute, the menu item IsEnabled seems buggy when that's done...just manually bind IsEnabled
             QuickSaveAsPngCommand = new DelegateCommand(OnQuickSaveAsPng);
+            EditFrameCommand = new DelegateCommand(OnEditFrame);
             ExitCommand = new DelegateCommand(OnExit);
             ShowAboutCommand = new DelegateCommand(OnShowAbout);
 
             RefreshCanOpen();
             RefreshCanQuickSaveAsPng();
+            RefreshCanEditFrame();
             RefreshCanExit();
             RefreshCanShowAbout();
         }
@@ -158,6 +180,10 @@ namespace DFOToolbox
             else if (e.PropertyName == MainWindowViewModel.PropertyNameCanOpen)
             {
                 RefreshCanOpen();
+            }
+            else if (e.PropertyName == MainWindowViewModel.PropertyNameCanEditFrame)
+            {
+                RefreshCanEditFrame();
             }
         }
 
@@ -215,6 +241,46 @@ namespace DFOToolbox
                 {
                     ViewModel.Status = "Saved {0} images to {1}".F(results.Count, results[0].OutputFolder);
                 }
+            }
+        }
+
+        private void OnEditFrame()
+        {
+            if (!CanEditFrame())
+            {
+                return;
+            }
+
+            string imgPath = ViewModel.InnerFileList.Current.Path;
+            int frameIndex = ViewModel.FrameList.Current.Index;
+
+            OpenFileDialog filePicker = new OpenFileDialog()
+            {
+                CheckFileExists = true,
+                CheckPathExists = true,
+                Filter = "PNG files (*.PNG)|*.PNG",
+                Multiselect = false,
+                Title = "Select image file"
+            };
+
+            if (filePicker.ShowDialog() != true)
+            {
+                return;
+            }
+
+            string newFramePngPath = filePicker.FileName;
+
+            try
+            {
+                ViewModel.EditFrame(imgPath, frameIndex, newFramePngPath);
+            }
+            catch (DFOToolboxException ex)
+            {
+                MessageBox.Show(string.Format("Error saving frame: {0}", ex.Message));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Error saving frame: {0}", ex.Message));
             }
         }
     }

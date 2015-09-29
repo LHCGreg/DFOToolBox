@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Globalization;
+using MiscUtil.Conversion;
 
 namespace DFO.Utilities
 {
@@ -148,25 +149,17 @@ namespace DFO.Utilities
         }
 
         /// <summary>
-        /// Copies the input stream to the output stream.
+        /// Writes a 32-bit unsigned litte-endian integer, using <paramref name="buffer"/> as temporary storage for the bytes to write.
+        /// <paramref name="buffer"/> must be at least 4 bytes.
         /// </summary>
-        /// <param name="input"></param>
-        /// <param name="output"></param>
-        /// <exception cref="System.IO.IOException"></exception>
-        /// <exception cref="System.NotSupportedException"></exception>
-        /// <exception cref="System.ObjectDisposedException"></exception>
-        /// <exception cref="System.ArgumentNullException"></exception>
-        public static void CopyTo(this Stream input, Stream output)
+        /// <param name="stream"></param>
+        /// <param name="num"></param>
+        /// <param name="buffer"></param>
+        /// <param name="offset"></param>
+        public static void WriteUnsigned32Le(this Stream stream, uint num, byte[] buffer, int offset = 0)
         {
-            output.ThrowIfNull("output");
-
-            const int bufferSize = 8192;
-            byte[] buffer = new byte[bufferSize];
-            int read;
-            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                output.Write(buffer, 0, read);
-            }
+            EndianBitConverter.Little.CopyBytes(num, buffer, offset);
+            stream.Write(buffer, offset, 4);
         }
 
         /// <summary>
@@ -181,8 +174,40 @@ namespace DFO.Utilities
         {
             using (MemoryStream tempStream = new MemoryStream())
             {
-                CopyTo(input, tempStream);
+                input.CopyTo(tempStream);
                 return tempStream.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Copies <paramref name="numBytes"/> bytes from <paramref name="input"/> to <paramref name="output"/>.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="output"></param>
+        /// <param name="numBytes"></param>
+        public static void CopyToPartially(this Stream input, Stream output, int numBytes)
+        {
+            if (numBytes < 0)
+            {
+                throw new ArgumentOutOfRangeException("numBytes", numBytes, "Cannot copy a negative number of bytes ({0}).".F(numBytes));
+            }
+            input.ThrowIfNull("input");
+            output.ThrowIfNull("output");
+
+            const int bufferSize = 4096;
+            byte[] buffer = new byte[bufferSize];
+            int numBytesCopied = 0;
+            while (numBytesCopied < numBytes)
+            {
+                int numBytesToRead = bufferSize;
+                if (numBytes - numBytesCopied < bufferSize)
+                {
+                    numBytesToRead = numBytes - numBytesCopied;
+                }
+
+                input.ReadOrDie(buffer, numBytesToRead);
+                output.Write(buffer, 0, numBytesToRead);
+                numBytesCopied += numBytesToRead;
             }
         }
 

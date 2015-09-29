@@ -22,5 +22,10 @@ namespace DFOToolbox
 
         QuickSaveResults QuickSaveAsPng(string imgPath, int frameIndex);
         bool CanQuickSaveAsPng { get; set; }
+
+        /// <exception cref="DFOToolbox.DFOToolboxException">Something went wrong while editing. Message is suitable for UI display.</exception>
+        /// <exception cref="System.Exception">Other errors resulting from incorrect usage of this function, such as passing null arguments or trying to edit a frame while no file is open.</exception>
+        void EditFrame(string imgPath, int frameIndex, string pngFilePath);
+        bool CanEditFrame { get; set; }
     }
 }

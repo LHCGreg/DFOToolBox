@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DFO.Common.Images
 {
+    // These are in little-endian order, so 1555 ARGB should have the bytes on disk and in memory as BGRA
     public enum PixelDataFormat
     {
         OneFiveFiveFive = 14, // 0x0E

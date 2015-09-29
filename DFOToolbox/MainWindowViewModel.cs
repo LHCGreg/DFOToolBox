@@ -16,7 +16,8 @@ namespace DFOToolbox
 {
     public class MainWindowViewModel : NotifyPropertyChangedBase, IMainWindowViewModel, IDisposable
     {
-        private NpkReader _npk;
+        // Always set, never null
+        private NpkEditor _editor = new NpkEditor();
 
         private const string _quicksaveFolderName = "DFOToolbox";
         private string _quicksaveFolderPath;
@@ -108,6 +109,25 @@ namespace DFOToolbox
             CanQuickSaveAsPng = GetCanQuickSaveAsPng();
         }
 
+        private bool _canEditFrame;
+        public bool CanEditFrame
+        {
+            get { return _canEditFrame; }
+            set { if (value != _canEditFrame) { _canEditFrame = value; OnPropertyChanged(); } }
+        }
+
+        public const string PropertyNameCanEditFrame = "CanEditFrame";
+
+        private bool GetCanEditFrame()
+        {
+            return FrameList.Current != null;
+        }
+
+        private void RefreshCanEditFrame()
+        {
+            CanEditFrame = GetCanEditFrame();
+        }
+
         public MainWindowViewModel()
         {
             // TODO: inject dependencies
@@ -119,6 +139,7 @@ namespace DFOToolbox
             FrameList = new FrameList();
             // Note that SelectedItems may not be up to date yet in the CurrentChanged event handler
             FrameList.CurrentChanged += SelectedFrameChanged;
+            FrameList.CurrentChanged += (sender, e) => RefreshCanEditFrame();
             FrameList.SelectedItems.CollectionChanged += (sender, e) => RefreshCanQuickSaveAsPng();
 
             CanOpen = GetCanOpen();
@@ -135,12 +156,7 @@ namespace DFOToolbox
             // TODO: async?
             try
             {
-                NpkReader oldNpk = _npk;
-                _npk = new NpkReader(npkPath);
-                if (oldNpk != null)
-                {
-                    oldNpk.Dispose();
-                }
+                _editor.Open(npkPath);
             }
             catch (Exception ex)
             {
@@ -155,7 +171,7 @@ namespace DFOToolbox
 
             InnerFileList.Clear();
             FrameList.Clear();
-            foreach (NpkPath imgPath in _npk.Images.Keys)
+            foreach (NpkPath imgPath in _editor.Images.Keys)
             {
                 string imgName = imgPath.GetPathComponents().LastOrDefault();
                 if (imgName == null) continue; // TODO: Log this, something would have to be strange
@@ -170,6 +186,17 @@ namespace DFOToolbox
         }
 
         private void SelectedInnerFileChanged(object sender, EventArgs e)
+        {
+            RefreshFrameList();
+
+            // Select first frame
+            if (FrameList.Count > 0)
+            {
+                FrameList.MoveCurrentToFirst();
+            }
+        }
+
+        private void RefreshFrameList()
         {
             // Clear frame list
             FrameList.Clear();
@@ -187,7 +214,7 @@ namespace DFOToolbox
             List<FrameInfo> frames;
             try
             {
-                frames = _npk.Frames[selectedFile.Path].ToList();
+                frames = _editor.Frames[selectedFile.Path].ToList();
             }
             catch (Exception ex)
             {
@@ -237,12 +264,6 @@ namespace DFOToolbox
                     FrameList.Add(new FrameMetadata(frame, frameIndex, linkFrameIndex: null));
                 }
             }
-
-            // Select first frame
-            if (FrameList.Count > 0)
-            {
-                FrameList.MoveCurrentToFirst();
-            }
         }
 
         private void SelectedFrameChanged(object sender, EventArgs e)
@@ -259,7 +280,7 @@ namespace DFOToolbox
             DFO.Common.Images.Image image = null;
             try
             {
-                image = _npk.GetImage(selectedFile.Path, frame.Index);
+                image = _editor.GetImage(selectedFile.Path, frame.Index);
             }
             catch (Exception)
             {
@@ -279,7 +300,6 @@ namespace DFOToolbox
             // RGBA -> BGRA (for little endian platforms), (BGRA for big endian platforms) - seems to not be reversed for little endian???
             // TODO: Make NpkReader able to output in variable format so it doesn't need to be converted
             byte[] frameBytes = new byte[_width * _height * 4];
-            bool isLittleEndian = BitConverter.IsLittleEndian;
 
             // Get X in frame
             // bounding box X + _smallestX = frame x
@@ -374,7 +394,7 @@ namespace DFOToolbox
             {
                 using (FileStream pngOutput = File.Open(path, FileMode.Create))
                 {
-                    Export.ToPng(_npk, imgPath, frameIndex, pngOutput);
+                    Export.ToPng(_editor, imgPath, frameIndex, pngOutput);
                 }
             }
             catch (Exception ex)
@@ -396,11 +416,91 @@ namespace DFOToolbox
             return imgPath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="imgPath"></param>
+        /// <param name="frameIndex"></param>
+        /// <param name="pngFilePath"></param>
+        /// <exception cref="DFOToolbox.DFOToolboxException">Something went wrong while editing. Message is suitable for UI display.</exception>
+        /// <exception cref="System.Exception">Other errors resulting from incorrect usage of this function, such as passing null arguments or trying to edit a frame while no file is open.</exception>
+        public void EditFrame(string imgPath, int frameIndex, string pngFilePath)
+        {
+            // validate that we have a file open for editing, that it has the img, that it has the frame index, that the file exists
+            imgPath.ThrowIfNull("imgPath");
+            pngFilePath.ThrowIfNull("pngFileName");
+            if (!_editor.IsOpen)
+            {
+                throw new InvalidOperationException("Cannot edit a frame because no file is currently open.");
+            }
+
+            NpkPath npkPath = imgPath;
+            if (!_editor.Frames.ContainsKey(npkPath))
+            {
+                throw new KeyNotFoundException("There is no img with path {0}.".F(imgPath));
+            }
+
+            if (frameIndex >= _editor.Frames[npkPath].Count)
+            {
+                throw new ArgumentOutOfRangeException("{0} does not have a frame with index {1}.".F(imgPath, frameIndex));
+            }
+
+            FrameInfo uneditedFrameMetadata = _editor.Frames[npkPath][frameIndex];
+
+            // Use same pixel format as original.
+            // If it's a link frame, we're turning it into a non-link frame, so use 8888 as that will preserve the colors of the new image.
+            PixelDataFormat pixelFormatToUse = uneditedFrameMetadata.PixelFormat;
+            if (pixelFormatToUse == PixelDataFormat.Link)
+            {
+                pixelFormatToUse = PixelDataFormat.EightEightEightEight;
+            }
+
+            if (!File.Exists(pngFilePath))
+            {
+                throw new DFOToolboxException("{0} does not exist.".F(pngFilePath));
+            }
+
+            byte[] newImageBytesInCorrectFormat;
+            int newImageWidth;
+            int newImageHeight;
+
+            // Load image pixels into memory
+            // TODO: catch exceptions
+            using (System.Drawing.Bitmap inputImage = new System.Drawing.Bitmap(pngFilePath))
+            {
+                // need to get pixels into format used by image
+                newImageBytesInCorrectFormat = PixelConversion.Convert(inputImage, pixelFormatToUse);
+                newImageWidth = inputImage.Width;
+                newImageHeight = inputImage.Height;
+            }
+
+            using (MemoryStream newImageBytesInCorrectFormatStream = new MemoryStream(newImageBytesInCorrectFormat))
+            {
+                FrameInfo newFrameMetadata = new FrameInfo(
+                    isCompressed: uneditedFrameMetadata.IsCompressed,
+                    compressedLength: -1, // not used
+                    pixelFormat: pixelFormatToUse,
+                    width: newImageWidth,
+                    height: newImageHeight,
+                    locationX: uneditedFrameMetadata.LocationX,
+                    locationY: uneditedFrameMetadata.LocationY,
+                    maxWidth: uneditedFrameMetadata.MaxWidth,
+                    maxHeight: uneditedFrameMetadata.MaxHeight
+                );
+
+                _editor.EditFrame(npkPath, frameIndex, newFrameMetadata, newImageBytesInCorrectFormatStream);
+            }
+
+            // XXX: This code assumes the imgPath passed in is currently selected
+            RefreshFrameList();
+            FrameList.MoveCurrentToPosition(frameIndex);
+        }
+
         public void Dispose()
         {
-            if (_npk != null)
+            if (_editor != null)
             {
-                _npk.Dispose();
+                _editor.Dispose();
             }
         }
     }

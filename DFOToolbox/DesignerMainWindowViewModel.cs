@@ -57,5 +57,12 @@ namespace DFOToolbox
         {
             return new QuickSaveResults() { Error = new DFOToolboxException("Designer viewmodel doesn't support saving.") };
         }
+
+        public bool CanEditFrame { get; set; }
+
+        public void EditFrame(string imgPath, int frameIndex, string pngFilePath)
+        {
+            
+        }
     }
 }
