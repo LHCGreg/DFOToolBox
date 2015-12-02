@@ -89,7 +89,7 @@ namespace DFO.npkdiff
             }
             foreach (ImgInfo img in differences.ImgsInFirstButNotSecond.OrderBy(x => x.Path.Path))
             {
-                Console.WriteLine("-{0} ({1}): {2}", img, img.FrameCount, img.NpkFileName);
+                Console.WriteLine("-{0} ({1}): {2}", img.Path, img.FrameCount, img.NpkFileName);
             }
         }
     }
